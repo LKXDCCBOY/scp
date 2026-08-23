@@ -1,0 +1,87 @@
+{
+  "name": "scp",
+  "version": "1.0.0",
+  "description": "Scientific Calculator Plus",
+  "main": "electron/main.js",
+  "author": "Prism Technology Studio",
+  "license": "MIT",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "icons": "node scripts/gen-icons.js",
+    "electron:dev": "concurrently -k \"npm:dev\" \"wait-on http://localhost:5173 && cross-env NODE_ENV=development electron .\"",
+    "electron:build": "npm run icons && npm run build && electron-builder",
+    "electron:build:win": "npm run icons && npm run build && electron-builder --win",
+    "electron:build:nsis": "npm run icons && npm run build && electron-builder --win nsis",
+    "android:init": "npm run build && npx cap add android && npm run icons",
+    "android:open": "npx cap open android",
+    "android:sync": "npm run build && npm run icons && npx cap sync android",
+    "android:copy": "npm run build && npm run icons && npx cap copy android",
+    "android:debug": "npm run android:copy && (if (Test-Path android\\gradlew.bat) { cd android ; .\\gradlew.bat assembleDebug --no-daemon } else { npx cap build android } )",
+    "android:release": "npm run android:copy && (if (Test-Path android\\gradlew.bat) { cd android ; .\\gradlew.bat assembleRelease --no-daemon } else { npx cap build android } )",
+    "android:apk": "npm run android:debug"
+  },
+  "dependencies": {
+    "vue": "^3.5.41"
+  },
+  "devDependencies": {
+    "@capacitor/android": "^5.0.0",
+    "@capacitor/cli": "^5.0.0",
+    "@capacitor/core": "^5.0.0",
+    "@vitejs/plugin-vue": "^5.2.4",
+    "autoprefixer": "^10.5.4",
+    "concurrently": "^8.2.2",
+    "cross-env": "^7.0.3",
+    "electron": "^28.0.0",
+    "electron-builder": "^24.9.0",
+    "postcss": "^8.5.26",
+    "tailwindcss": "^3.4.19",
+    "vite": "^5.4.21",
+    "wait-on": "^7.2.0"
+  },
+  "build": {
+    "appId": "com.scientific.calculator",
+    "productName": "SCP",
+    "copyright": "Copyright © 2026 Prism Technology Studio",
+    "asar": true,
+    "directories": {
+      "output": "release-final"
+    },
+    "files": [
+      "dist/**/*",
+      "electron/**/*"
+    ],
+    "extraMetadata": {
+      "name": "SCP"
+    },
+    "win": {
+      "target": [
+        { "target": "nsis", "arch": ["x64"] },
+        { "target": "portable", "arch": ["x64"] },
+        { "target": "zip", "arch": ["x64"] }
+      ],
+      "icon": "build/icon.ico",
+      "artifactName": "SCP-${version}-${arch}.${ext}",
+      "signAndEditExecutable": false,
+      "legalTrademarks": "SCP",
+      "executableName": "SCP",
+      "publisherName": "Prism Technology Studio"
+    },
+    "portable": {
+      "artifactName": "SCP-Portable-${version}-${arch}.${ext}"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "SCP",
+      "displayLanguageSelector": false,
+      "installerIcon": "build/icon.ico",
+      "uninstallerIcon": "build/icon.ico",
+      "installerHeaderIcon": "build/icon.ico",
+      "artifactName": "SCP-Setup-${version}-${arch}.${ext}"
+    }
+  }
+}

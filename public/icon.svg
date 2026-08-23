@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0a0a0f"/>
+      <stop offset="100%" stop-color="#1a1a2e"/>
+    </linearGradient>
+    <linearGradient id="glow" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#4f8cff" stop-opacity="0.8"/>
+      <stop offset="100%" stop-color="#7c5cff" stop-opacity="0.8"/>
+    </linearGradient>
+    <filter id="blur" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="18"/>
+    </filter>
+  </defs>
+  <rect width="512" height="512" rx="96" fill="url(#bg)"/>
+  <circle cx="140" cy="130" r="120" fill="#4f8cff" opacity="0.35" filter="url(#blur)"/>
+  <circle cx="380" cy="400" r="140" fill="#7c5cff" opacity="0.35" filter="url(#blur)"/>
+  <rect x="84" y="64" width="344" height="384" rx="48"
+        fill="rgba(20,20,30,0.45)" stroke="rgba(255,255,255,0.12)" stroke-width="2"/>
+  <rect x="108" y="92" width="296" height="88" rx="20"
+        fill="rgba(0,0,0,0.45)" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+  <text x="384" y="148" text-anchor="end" font-family="JetBrains Mono, monospace"
+        font-size="36" font-weight="700" fill="#ffffff">831.76</text>
+  <text x="132" y="160" text-anchor="start" font-family="JetBrains Mono, monospace"
+        font-size="16" fill="rgba(255,255,255,0.55)">sin(30)+ln(e²)</text>
+  <g transform="translate(108 210)">
+    <!-- 按键行 -->
+    <g>
+      <rect x="0"   y="0" width="60" height="48" rx="12" fill="rgba(124,92,255,0.25)"/>
+      <rect x="72"  y="0" width="60" height="48" rx="12" fill="rgba(124,92,255,0.25)"/>
+      <rect x="144" y="0" width="60" height="48" rx="12" fill="rgba(124,92,255,0.25)"/>
+      <rect x="216" y="0" width="80" height="48" rx="12" fill="rgba(79,140,255,0.4)"/>
+    </g>
+    <g transform="translate(0 60)">
+      <rect x="0"   y="0" width="60" height="48" rx="12" fill="rgba(40,40,55,0.7)"/>
+      <rect x="72"  y="0" width="60" height="48" rx="12" fill="rgba(40,40,55,0.7)"/>
+      <rect x="144" y="0" width="60" height="48" rx="12" fill="rgba(40,40,55,0.7)"/>
+      <rect x="216" y="0" width="80" height="48" rx="12" fill="rgba(79,140,255,0.4)"/>
+    </g>
+    <g transform="translate(0 120)">
+      <rect x="0"   y="0" width="60" height="48" rx="12" fill="rgba(40,40,55,0.7)"/>
+      <rect x="72"  y="0" width="60" height="48" rx="12" fill="rgba(40,40,55,0.7)"/>
+      <rect x="144" y="0" width="60" height="48" rx="12" fill="rgba(40,40,55,0.7)"/>
+      <rect x="216" y="0" width="80" height="48" rx="12" fill="url(#glow)"/>
+    </g>
+  </g>
+</svg>

@@ -1,0 +1,14 @@
+{
+  "appId": "com.scientific.calculator",
+  "appName": "科学计算器",
+  "webDir": "dist",
+  "server": {
+    "androidScheme": "https"
+  },
+  "android": {
+    "buildOptions": {
+      "keystorePath": "",
+      "keystoreAlias": ""
+    }
+  }
+}

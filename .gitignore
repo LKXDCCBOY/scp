@@ -1,0 +1,46 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+release*/
+build/outputs/
+
+# Cache
+.cache/
+*.log
+
+# Environment
+.env
+.env.*
+!.env.example
+
+# IDE
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+
+# OS
+Thumbs.db
+Desktop.ini
+.DS_Store
+
+# Electron
+out/
+
+# Android
+android/app/build/
+android/build/
+android/.gradle/
+android/local.properties
+android/captures/
+android/app/release/
+*.keystore
+!debug.keystore
+
+# Python
+__pycache__/
+*.pyc
