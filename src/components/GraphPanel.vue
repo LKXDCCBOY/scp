@@ -1,5 +1,7 @@
 <template>
-  <div class="glass-panel p-3 sm:p-4 w-full h-full flex flex-col min-h-0">
+  <div :class="isFullscreen
+    ? 'fixed inset-0 z-50 bg-slate-900/95 backdrop-blur-2xl p-4 flex flex-col min-h-0'
+    : 'glass-panel p-3 sm:p-4 w-full h-full flex flex-col min-h-0'">
     <!-- 工具栏 -->
     <div class="flex-none flex items-center gap-2 mb-2 flex-wrap">
       <span class="text-xs sm:text-sm font-medium text-white/70">{{ t('graph.title') }}</span>
@@ -7,10 +9,20 @@
       <button @click="resetView" class="text-[11px] px-2 py-1 rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 transition">{{ t('graph.resetView') }}</button>
       <button @click="zoomBy(1.5)" class="text-[11px] px-2 py-1 rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 transition">{{ t('graph.zoomIn') }}</button>
       <button @click="zoomBy(1/1.5)" class="text-[11px] px-2 py-1 rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 transition">{{ t('graph.zoomOut') }}</button>
+      <button @click="toggleFullscreen" class="text-[11px] px-2 py-1 rounded-lg bg-calc-primary/20 border border-calc-primary/40 hover:bg-calc-primary/30 transition flex items-center gap-1">
+        <svg v-if="!isFullscreen" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3M3 16v3a2 2 0 0 0 2 2h3m13-5v3a2 2 0 0 1-2 2h-3"/>
+        </svg>
+        <svg v-else viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M8 3v3a2 2 0 0 1-2 2H3m18 0h-3a2 2 0 0 1-2-2V3M3 16h3a2 2 0 0 1 2 2v3m13-5v3a2 2 0 0 0-2 2h-3"/>
+        </svg>
+        {{ isFullscreen ? t('graph.exitFullscreen') : t('graph.fullscreen') }}
+      </button>
     </div>
 
     <!-- 函数输入列表 -->
-    <div class="flex-none space-y-1.5 mb-2 max-h-[120px] overflow-y-auto scrollbar-thin">
+    <div class="flex-none space-y-1.5 mb-2 overflow-y-auto scrollbar-thin"
+         :class="isFullscreen ? 'max-h-[100px]' : 'max-h-[120px]'">
       <div v-for="(f, i) in funcs" :key="i" class="flex items-center gap-1.5">
         <span class="w-4 h-4 rounded-full flex-none border border-white/20" :style="{ background: f.color }"></span>
         <span class="text-[11px] text-white/50 flex-none w-10">y =</span>
@@ -46,6 +58,10 @@
       <div class="absolute top-2 left-2 text-[11px] font-mono text-white/50 bg-black/40 rounded-lg px-2 py-1 pointer-events-none">
         {{ t('graph.viewLabel', { scale: scale.toFixed(1), cx: centerX.toFixed(2), cy: centerY.toFixed(2) }) }}
       </div>
+      <!-- 全屏退出提示 -->
+      <div v-if="isFullscreen" class="absolute top-2 right-2 text-[11px] font-mono text-white/40 bg-black/40 rounded-lg px-2 py-1 pointer-events-none">
+        Esc {{ t('graph.exitFullscreen') }}
+      </div>
     </div>
   </div>
 </template>
@@ -63,6 +79,7 @@ const router = bindInputRouter()
 
 const canvas = ref<HTMLCanvasElement>()
 const canvasWrap = ref<HTMLElement>()
+const isFullscreen = ref(false)
 
 // 16 色调色板：覆盖全色谱、感知差异大、暗/亮主题下均可辨识
 const colors = [
@@ -87,10 +104,9 @@ let colorIdx = 0
 
 interface FuncDef { expr: string; color: string; enabled: boolean }
 const funcs = reactive<FuncDef[]>([
-  { expr: 'sin(x)', color: colors[0], enabled: true },
-  { expr: 'x^2/5-3', color: colors[1], enabled: true }
+  { expr: '', color: colors[0], enabled: true }
 ])
-colorIdx = 2
+colorIdx = 1
 
 // 视图状态：数学坐标系中心 + 缩放
 const centerX = ref(0)
@@ -116,6 +132,24 @@ function resetView() {
   centerY.value = 0
   scale.value = 40
   redraw()
+}
+
+function toggleFullscreen() {
+  isFullscreen.value = !isFullscreen.value
+  nextTick(() => {
+    resizeCanvas()
+    redraw()
+  })
+}
+
+function onEscKey(e: KeyboardEvent) {
+  if (e.key === 'Escape' && isFullscreen.value) {
+    isFullscreen.value = false
+    nextTick(() => {
+      resizeCanvas()
+      redraw()
+    })
+  }
 }
 
 function zoomBy(factor: number) {
@@ -341,11 +375,13 @@ onMounted(async () => {
     redraw()
   })
   if (canvasWrap.value) resizeObs.observe(canvasWrap.value)
+  window.addEventListener('keydown', onEscKey)
 })
 
 onUnmounted(() => {
   resizeObs?.disconnect()
   cancelAnimationFrame(rafId)
+  window.removeEventListener('keydown', onEscKey)
 })
 
 // 暴露 redraw 供外部调用

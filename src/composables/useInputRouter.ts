@@ -78,14 +78,53 @@ export function useInputRouter() {
 
   function mapKeyToChar(k: string): string | null {
     switch (k) {
+      // 数字
       case '0': case '1': case '2': case '3': case '4':
       case '5': case '6': case '7': case '8': case '9':
-      case '.': case '+': case '-': case '*': case '/':
-      case '(': case ')': case '^': case '%': case '!':
-      case ',': case 'x': case 'X':
-        return k === 'x' || k === 'X' ? 'x' : k
-      case 'pi': return 'π'
+      case '.':
+        return k
+      // 基本运算符
+      case '+': return '+'
+      case '-': return '-'
+      case '×': return '*'
+      case '÷': return '/'
+      case '^': return '^'
+      case '%': return '%'
+      case '!': return '!'
+      case 'x!': return '!'
+      case '(': return '('
+      case ')': return ')'
+      case ',': return ','
+      case '=': return '='
+      // 变量
+      case 'x': case 'X': return 'x'
+      case 'y': case 'Y': return 'y'
+      // 常量
+      case 'pi': return 'pi'
       case 'e': return 'e'
+      // 负号
+      case '(-)': return '-'
+      // 幂
+      case 'x²': return '^2'
+      case 'x³': return '^3'
+      case 'EXP': return 'E'
+      // 答案
+      case 'Ans': return 'Ans'
+      // 函数 → 带左括号插入
+      case 'sin': case 'cos': case 'tan':
+      case 'sinh': case 'cosh': case 'tanh':
+      case 'log': case 'ln': case 'log2':
+      case 'sqrt': case 'cbrt': case 'abs': case 'floor':
+        return k + '('
+      // 文本/Python 符号
+      case 'SPC': return ' '
+      case ';': return ';'
+      case ':': return ':'
+      case '<': return '<'
+      case '>': return '>'
+      case '_': return '_'
+      case '↵': return '\n'
+      // 编辑/导航
       case 'DEL': return '__BACKSPACE__'
       case 'AC': return '__CLEAR__'
       case '◀': return '__LEFT__'

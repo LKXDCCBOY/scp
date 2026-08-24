@@ -1,7 +1,7 @@
 <template>
   <div class="glass-panel p-2 sm:p-2.5 w-full h-full flex flex-col">
     <div class="grid gap-1 sm:gap-1.5 grid-cols-6 flex-1"
-         style="grid-template-rows: repeat(9, minmax(0, 1fr));">
+         style="grid-template-rows: repeat(10, minmax(0, 1fr));">
       <CalcKey
         v-for="(k, idx) in layout" :key="k.id + idx"
         :item="k"
@@ -78,13 +78,20 @@ const layout = computed<KeyDef[]>(() => [
   OP('-', { size: 1, label: '−' }),
   OP('+', { size: 1, label: '+' }),
   SPECIAL('x!',  { label: 'x!' }),
-  // row 9
-  SPECIAL('nPr', { shift: 'nCr', subLabel: 'nCr' }),
-  SPECIAL('Pol', { shift: 'Rec', subLabel: 'Rec' }),
-  FUNC(',',  { label: ',', size: 0 }),
+  // row 9 — 变量与符号
+  FUNC('x', { label: 'x', cls: 'key-special', size: 1 }),
+  FUNC('y', { label: 'y', cls: 'key-special', size: 1 }),
+  FUNC('=', { cls: 'key-eq', size: 1, label: '=' }),
+  SPECIAL('!', { label: '!', cls: 'key-op' }),
   SPECIAL('%', { label: '%', cls: 'key-op' }),
-  SPECIAL('log2', { label: 'log2', cls: 'key-func' }),
-  FUNC('=', { cls: 'key-eq', size: 1, label: '=' })
+  FUNC(',',  { label: ',', size: 0 }),
+  // row 10 — 文本/Python 符号
+  FUNC('SPC', { label: 'SPC', cls: 'key-func', size: 2 }),
+  FUNC(';',  { label: ';', size: 0 }),
+  FUNC(':',  { label: ':', size: 0 }),
+  FUNC('<',  { label: '<', size: 0 }),
+  FUNC('>',  { label: '>', size: 0 }),
+  FUNC('↵',  { label: '↵', cls: 'key-special', size: 0 })
 ])
 
 function handlePress(k: KeyDef, _emitted: string) {

@@ -47,11 +47,18 @@ export const messages = {
       EXP: '科学记数法 x10^ (SHIFT: e 的 x 次方)',
       '-': '减法', '+': '加法',
       'x!': '阶乘 x!',
-      nPr: '排列 nPr (SHIFT: 组合 nCr)',
-      Pol: '极坐标转换 Pol(r,theta) (SHIFT: 直角坐标 Rec)',
+      x: '变量 x（函数自变量）',
+      y: '变量 y（函数因变量）',
+      '!': '阶乘符号 !',
       ',': '参数分隔逗号',
-      '%': '百分号', log2: '以 2 为底的对数 log₂(x)',
-      '=': '等号 — 执行计算'
+      '%': '百分号',
+      '=': '等号 — 执行计算或方程赋值',
+      SPC: '空格（矩阵/数据分隔）',
+      ';': '分号（矩阵行分隔）',
+      ':': '冒号（Python 代码块）',
+      '<': '小于号（Python 比较）',
+      '>': '大于号（Python 比较）',
+      '↵': '换行（Python 多行代码）'
     },
     // 标签页
     tabs: {
@@ -89,7 +96,9 @@ export const messages = {
       addFunc: '+ 添加函数',
       placeholder: 'f(x) 如 sin(x) 或 x^2-3',
       coordLabel: 'x: {x}  y: {y}',
-      viewLabel: '缩放: {scale}x | 中心: ({cx}, {cy})'
+      viewLabel: '缩放: {scale}x | 中心: ({cx}, {cy})',
+      fullscreen: '全屏',
+      exitFullscreen: '退出全屏'
     },
     // 高级工具
     advanced: {
@@ -348,11 +357,18 @@ print("det(A) =", det2(A))
       EXP: 'Scientific notation x10^ (SHIFT: e^x)',
       '-': 'Subtraction', '+': 'Addition',
       'x!': 'Factorial x!',
-      nPr: 'Permutation nPr (SHIFT: combination nCr)',
-      Pol: 'Polar conversion Pol(r,theta) (SHIFT: rectangular Rec)',
+      x: 'Variable x (function argument)',
+      y: 'Variable y (function dependent)',
+      '!': 'Factorial symbol !',
       ',': 'Argument separator comma',
-      '%': 'Percent', log2: 'Base-2 logarithm log₂(x)',
-      '=': 'Equals — execute calculation'
+      '%': 'Percent',
+      '=': 'Equals — execute or assign',
+      SPC: 'Space (matrix/data separator)',
+      ';': 'Semicolon (matrix row separator)',
+      ':': 'Colon (Python code block)',
+      '<': 'Less than (Python comparison)',
+      '>': 'Greater than (Python comparison)',
+      '↵': 'Newline (Python multiline)'
     },
     tabs: {
       calc: 'Calc',
@@ -386,7 +402,9 @@ print("det(A) =", det2(A))
       addFunc: '+ Add Function',
       placeholder: 'f(x) e.g. sin(x) or x^2-3',
       coordLabel: 'x: {x}  y: {y}',
-      viewLabel: 'Zoom: {scale}x | Center: ({cx}, {cy})'
+      viewLabel: 'Zoom: {scale}x | Center: ({cx}, {cy})',
+      fullscreen: 'Fullscreen',
+      exitFullscreen: 'Exit Fullscreen'
     },
     advanced: {
       title: 'Advanced Math Tools',

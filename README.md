@@ -1,5 +1,7 @@
 # SCP - Scientific Calculator Plus
 
+**English** | [中文](./README.zh.md)
+
 A professional scientific calculator desktop application with a Casio-style soft keyboard, glassmorphism UI, multi-theme support, and advanced mathematical capabilities.
 
 Developed by **Prism Technology Studio** (c) 2026

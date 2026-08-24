@@ -350,31 +350,31 @@ type ModId = 'eqn' | 'mat' | 'vec' | 'stat' | 'calc'
 const props = defineProps<{ module: ModId }>()
 
 // 方程
-const quad = ref(['1', '-5', '6'])
-const cubic = ref(['1', '-6', '11', '-6'])
-const nlExpr = ref('sin(x)-x/2')
-const nlRange = ref(['0', '4'])
-const linA = ref('1 2 3; 4 5 6; 7 8 10')
-const linB = ref('1, 2, 3')
+const quad = ref(['', '', ''])
+const cubic = ref(['', '', '', ''])
+const nlExpr = ref('')
+const nlRange = ref(['', ''])
+const linA = ref('')
+const linB = ref('')
 
 // 矩阵
-const matA = ref('1 2 3; 4 5 6; 7 8 10')
-const matB = ref('1 0 0; 0 1 0; 0 0 1')
+const matA = ref('')
+const matB = ref('')
 
 // 向量
-const vecA = ref('1, 2, 3')
-const vecB = ref('4, 5, 6')
+const vecA = ref('')
+const vecB = ref('')
 
 // 统计
-const statX = ref('1 2 3 4 5 6 7 8')
-const statY = ref('1.1 2.2 3.1 4.0 5.2 6.1 7.0 8.1')
+const statX = ref('')
+const statY = ref('')
 
 // 微积分
-const dfExpr = ref('sin(x)*x^2')
-const dfX = ref('1')
-const dfOrder = ref('1')
-const intExpr = ref('sin(x)+x')
-const intRange = ref(['0', '3.14159265'])
+const dfExpr = ref('')
+const dfX = ref('')
+const dfOrder = ref('')
+const intExpr = ref('')
+const intRange = ref(['', ''])
 
 // ============================================================
 // 输出

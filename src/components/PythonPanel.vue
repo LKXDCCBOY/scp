@@ -49,9 +49,6 @@
           v-model="code"
           @keydown.ctrl.enter.prevent="runCode"
           @keydown.meta.enter.prevent="runCode"
-          @focus="router.onFocus"
-          @keydown.capture="router.onKeydownCapture"
-          :readonly="router.readonly"
           class="w-full h-[100px] bg-black/30 border border-white/10 rounded-xl px-3 py-2 text-xs sm:text-sm
                  font-mono text-white resize-none focus:outline-none focus:border-calc-primary/60
                  scrollbar-thin leading-relaxed"

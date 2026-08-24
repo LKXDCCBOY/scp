@@ -151,26 +151,25 @@ function fmt(v: number) {
 // 换算
 interface Pair { from: string; to: string; factor: number; a?: number; b?: number }
 const LEN: Pair[] = [
-  { from: 'km', to: 'mi', factor: 0.621371, a: 1 },
-  { from: 'm',  to: 'ft', factor: 3.28084,  a: 1 },
-  { from: 'cm', to: 'in', factor: 0.393701, a: 1 }
+  { from: 'km', to: 'mi', factor: 0.621371 },
+  { from: 'm',  to: 'ft', factor: 3.28084 },
+  { from: 'cm', to: 'in', factor: 0.393701 }
 ]
 const WGHT: Pair[] = [
-  { from: 'kg',  to: 'lb',  factor: 2.20462, a: 1 },
-  { from: 'g',   to: 'oz',  factor: 0.035274, a: 1 },
-  { from: '°C',  to: '°F',  factor: NaN, a: 0 } // 特殊处理
+  { from: 'kg',  to: 'lb',  factor: 2.20462 },
+  { from: 'g',   to: 'oz',  factor: 0.035274 },
+  { from: '°C',  to: '°F',  factor: NaN }
 ]
 const DATA: Pair[] = [
-  { from: 'GB', to: 'MB', factor: 1024, a: 1 },
-  { from: 'MB', to: 'KB', factor: 1024, a: 1 },
-  { from: 'KB', to: 'B',  factor: 1024, a: 1 }
+  { from: 'GB', to: 'MB', factor: 1024 },
+  { from: 'MB', to: 'KB', factor: 1024 },
+  { from: 'KB', to: 'B',  factor: 1024 }
 ]
 const VOLT: Pair[] = [
-  { from: 'L',   to: 'gal', factor: 0.264172, a: 1 },
-  { from: 'kWh', to: 'J',   factor: 3.6e6,    a: 1 },
-  { from: 'bar', to: 'Pa',  factor: 1e5,      a: 1 }
+  { from: 'L',   to: 'gal', factor: 0.264172 },
+  { from: 'kWh', to: 'J',   factor: 3.6e6 },
+  { from: 'bar', to: 'Pa',  factor: 1e5 }
 ]
-for (const p of [...LEN, ...WGHT, ...DATA, ...VOLT]) convert(p, 'a')
 
 const groups = reactive([
   { name: '长度', pairs: LEN },
