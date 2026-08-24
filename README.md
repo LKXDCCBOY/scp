@@ -132,9 +132,9 @@ Build artifacts are output to `release-final/`.
 ## Download
 
 Pre-built binaries are available on the [Releases](../../releases) page:
-- `SCP-Setup-1.0.0-x64.exe` — NSIS installer (recommended)
-- `SCP-Portable-1.0.0-x64.exe` — Portable standalone EXE
-- `SCP-1.0.0-x64.zip` — Zip archive
+- `SCP-Setup-1.0.1-x64.exe` — NSIS installer (recommended)
+- `SCP-Portable-1.0.1-x64.exe` — Portable standalone EXE
+- `SCP-1.0.1-x64.zip` — Zip archive
 
 ## License
 

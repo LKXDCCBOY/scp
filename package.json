@@ -1,6 +1,6 @@
 {
   "name": "scp",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Scientific Calculator Plus",
   "main": "electron/main.js",
   "author": "Prism Technology Studio",

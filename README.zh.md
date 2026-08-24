@@ -133,9 +133,9 @@ npm run android:apk
 ## 下载
 
 预编译二进制文件可在 [Releases](../../releases) 页面下载：
-- `SCP-Setup-1.0.0-x64.exe` — NSIS 安装版（推荐）
-- `SCP-Portable-1.0.0-x64.exe` — 便携版（免安装）
-- `SCP-1.0.0-x64.zip` — ZIP 压缩包
+- `SCP-Setup-1.0.1-x64.exe` — NSIS 安装版（推荐）
+- `SCP-Portable-1.0.1-x64.exe` — 便携版（免安装）
+- `SCP-1.0.1-x64.zip` — ZIP 压缩包
 
 ## 许可证
 
