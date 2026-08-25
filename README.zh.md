@@ -1,10 +1,9 @@
 # SCP - 科学计算器 Plus
 
 [![Languages](https://img.shields.io/badge/UI%20%E8%AF%AD%E8%A8%80-7-informational)](#)
-&nbsp;🇨🇳&nbsp;🇭🇰&nbsp;🇺🇸&nbsp;🇯🇵&nbsp;🇷🇺&nbsp;🇫🇷&nbsp;🇩🇪
 
-**文档语言:**
-[English](./README.md) | **简体中文** | 繁體中文 · 日本語 · Русский · Français · Deutsch
+**文档语言：**
+**🇨🇳 简体中文** | [🇭🇰 繁體中文](./README.zh-TW.md) | [🇺🇸 English](./README.md) | [🇯🇵 日本語](./README.ja.md) | [🇷🇺 Русский](./README.ru.md) | [🇫🇷 Français](./README.fr.md) | [🇩🇪 Deutsch](./README.de.md)
 
 > 界面语言切换入口：应用内顶部标题栏右侧 **Language** 下拉按钮（共 7 种语言）
 

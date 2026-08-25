@@ -1,10 +1,9 @@
 # SCP - Scientific Calculator Plus
 
 [![Languages](https://img.shields.io/badge/UI%20Languages-7-informational)](#)
-&nbsp;🇨🇳&nbsp;🇭🇰&nbsp;🇺🇸&nbsp;🇯🇵&nbsp;🇷🇺&nbsp;🇫🇷&nbsp;🇩🇪
 
-**README:**
-**English** | [中文 (简体)](./README.zh.md) | 繁體中文 · 日本語 · Русский · Français · Deutsch
+**Documentation:**
+[🇨🇳 简体中文](./README.zh.md) | [🇭🇰 繁體中文](./README.zh-TW.md) | **🇺🇸 English** | [🇯🇵 日本語](./README.ja.md) | [🇷🇺 Русский](./README.ru.md) | [🇫🇷 Français](./README.fr.md) | [🇩🇪 Deutsch](./README.de.md)
 
 > UI Language Switch: In-app top bar → **Language** dropdown (7 languages)
 
