@@ -21,6 +21,7 @@ Developed by **Prism Technology Studio** (c) 2026
 - 16-color palette for curve differentiation
 - Pan and zoom with mouse / touch
 - Coordinate grid with adaptive scale
+- Fullscreen mode with collapsible function control bar (top-left menu button)
 
 ### Advanced Mathematics
 - **Equation Solver**: Quadratic, cubic, and linear system equations
@@ -39,7 +40,14 @@ Developed by **Prism Technology Studio** (c) 2026
 - Three theme modes: Follow System / Dark / Light (CSS variable driven)
 - Animated aurora background and logo pulse
 - Hover hints: mouse over any key shows its function description
-- Multilingual: Chinese / English toggle
+- Multilingual (7 languages) with top-bar Language dropdown:
+  - 🇨🇳 Simplified Chinese (简体中文)
+  - 🇭🇰 Traditional Chinese (繁體中文)
+  - 🇺🇸 English
+  - 🇯🇵 Japanese (日本語)
+  - 🇷🇺 Russian (Русский)
+  - 🇫🇷 French (Français)
+  - 🇩🇪 German (Deutsch)
 - Responsive layout: landscape (keys left, screen right) on desktop
 
 ### Desktop & Mobile
@@ -80,8 +88,8 @@ src/
     advanced.ts           # Advanced math operations
     script.ts             # Math script interpreter
   i18n/            # Internationalization
-    messages.ts           # zh / en translation
-    index.ts              # Translation composable
+    messages.ts           # zh-CN / zh-TW / en-US / ja-JP / ru-RU / fr-FR / de-DE translations
+    index.ts              # Translation composable + language registry
   constants/       # Key layout definitions
   types/            # TypeScript type definitions
 electron/
@@ -132,9 +140,9 @@ Build artifacts are output to `release-final/`.
 ## Download
 
 Pre-built binaries are available on the [Releases](../../releases) page:
-- `SCP-Setup-1.0.1-x64.exe` — NSIS installer (recommended)
-- `SCP-Portable-1.0.1-x64.exe` — Portable standalone EXE
-- `SCP-1.0.1-x64.zip` — Zip archive
+- `SCP-Setup-1.1.0-x64.exe` — NSIS installer (recommended)
+- `SCP-Portable-1.1.0-x64.exe` — Portable standalone EXE
+- `SCP-1.1.0-x64.zip` — Zip archive
 
 ## License
 

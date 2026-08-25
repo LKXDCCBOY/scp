@@ -40,7 +40,14 @@
 - 三种主题：跟随系统 / 深色 / 明亮（CSS 变量驱动）
 - 极光背景动画与 Logo 脉动
 - 按键悬浮提示：鼠标悬停任意按键显示功能说明
-- 多语言：中文 / 英文切换
+- 多语言（7 种）支持，顶部菜单栏 Language 按钮切换：
+  - 🇨🇳 简体中文
+  - 🇭🇰 繁體中文
+  - 🇺🇸 English
+  - 🇯🇵 日本語
+  - 🇷🇺 Русский
+  - 🇫🇷 Français
+  - 🇩🇪 Deutsch
 - 响应式布局：桌面端横屏（左键盘、右屏幕）
 
 ### 桌面与移动端
@@ -81,8 +88,8 @@ src/
     advanced.ts           # 高级数学运算
     script.ts             # 数学脚本解释器
   i18n/            # 国际化
-    messages.ts           # 中 / 英翻译
-    index.ts              # 翻译组合式函数
+    messages.ts           # 简中 / 繁中 / 英 / 日 / 俄 / 法 / 德 翻译
+    index.ts              # 翻译组合式函数 + 语言注册表
   constants/       # 按键布局定义
   types/            # TypeScript 类型定义
 electron/
@@ -133,9 +140,9 @@ npm run android:apk
 ## 下载
 
 预编译二进制文件可在 [Releases](../../releases) 页面下载：
-- `SCP-Setup-1.0.1-x64.exe` — NSIS 安装版（推荐）
-- `SCP-Portable-1.0.1-x64.exe` — 便携版（免安装）
-- `SCP-1.0.1-x64.zip` — ZIP 压缩包
+- `SCP-Setup-1.1.0-x64.exe` — NSIS 安装版（推荐）
+- `SCP-Portable-1.1.0-x64.exe` — 便携版（免安装）
+- `SCP-1.1.0-x64.zip` — ZIP 压缩包
 
 ## 许可证
 

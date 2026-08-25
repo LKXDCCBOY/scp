@@ -6,13 +6,17 @@
     <!-- 顶部状态栏 -->
     <header class="flex-none w-full px-3 lg:px-4 py-1.5 flex items-center justify-between z-10 animate-fade-in gap-3">
       <div class="flex items-center gap-2 min-w-0">
-        <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-gradient-to-br from-blue-500/40 to-purple-500/40 border border-white/10 backdrop-blur-md
-                    flex items-center justify-center shadow-glow animate-logo-pulse overflow-hidden flex-none">
-          <img src="/icon.svg" alt="logo" class="w-5 h-5 sm:w-6 sm:h-6" />
+        <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-gradient-to-br from-blue-500/60 to-purple-500/60 border backdrop-blur-md
+                    flex items-center justify-center shadow-glow animate-logo-pulse overflow-hidden flex-none"
+             :style="{ borderColor: 'var(--chip-border)' }">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="9"/>
+            <path d="M12 6v6l4 2"/>
+          </svg>
         </div>
         <div class="min-w-0">
-          <h1 class="text-xs sm:text-sm font-semibold tracking-wide leading-tight truncate">{{ t('app.title') }}</h1>
-          <p class="text-[9px] sm:text-[10px] text-white/40 tracking-wider leading-tight truncate">{{ t('app.subtitle') }}</p>
+          <h1 class="text-xs sm:text-sm font-semibold tracking-wide leading-tight truncate" :style="{ color: 'var(--text)' }">{{ t('app.title') }}</h1>
+          <p class="text-[9px] sm:text-[10px] tracking-wider leading-tight truncate" :style="{ color: 'var(--text-muted)' }">{{ t('app.subtitle') }}</p>
         </div>
       </div>
       <!-- 右侧：主题切换 + 语言切换 + 标签页 -->
@@ -45,17 +49,44 @@
             <line x1="12" y1="16" x2="12" y2="20"/>
           </svg>
         </button>
-        <!-- 语言切换 -->
-        <div class="flex items-center gap-0.5 rounded-md border p-0.5"
-             style="background: var(--chip-bg); border-color: var(--chip-border);">
-          <button v-for="l in languages" :key="l.code"
-            @click="setLang(l.code)"
-            class="text-[10px] sm:text-[11px] px-1.5 sm:px-2 py-0.5 sm:py-1 rounded transition"
-            :style="lang === l.code
-              ? { background: 'var(--primary-bg)', color: 'var(--primary-text)' }
-              : { color: 'var(--text-dim)' }">
-            {{ l.label }}
+        <!-- Language 按钮 + 下拉列表 -->
+        <div class="relative" data-lang-root>
+          <button @click.stop="langMenuOpen = !langMenuOpen"
+                  class="h-7 sm:h-8 px-2.5 rounded-lg flex items-center gap-1.5 border backdrop-blur-md transition hover:scale-105 active:scale-95"
+                  :style="{ background: 'var(--chip-bg)', borderColor: 'var(--chip-border)', color: 'var(--text)' }">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"/>
+              <line x1="2" y1="12" x2="22" y2="12"/>
+              <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+            </svg>
+            <span class="text-[10px] sm:text-[11px] font-medium">Language</span>
+            <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"
+                 class="transition-transform"
+                 :style="{ transform: langMenuOpen ? 'rotate(180deg)' : 'none', opacity: 0.6 }">
+              <polyline points="6 9 12 15 18 9"/>
+            </svg>
           </button>
+          <!-- 下拉列表 -->
+          <transition name="slide-up">
+            <div v-if="langMenuOpen"
+                 @click.stop
+                 class="absolute right-0 top-full mt-1.5 min-w-[180px] rounded-xl border backdrop-blur-2xl shadow-2xl p-1.5 z-[100]"
+                 :style="{ background: 'var(--panel-bg)', borderColor: 'var(--chip-border)' }">
+              <button v-for="l in languages" :key="l.code"
+                @click="pickLang(l.code)"
+                class="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-left transition"
+                :style="lang === l.code
+                  ? { background: 'var(--primary-bg)', color: 'var(--primary-text)' }
+                  : { color: 'var(--text)' }"
+                :class="lang !== l.code ? 'hover:opacity-80' : ''">
+                <span class="text-base">{{ l.flag }}</span>
+                <span class="text-[12px] sm:text-[13px] font-medium flex-1">{{ l.label }}</span>
+                <svg v-if="lang === l.code" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="20 6 9 17 4 12"/>
+                </svg>
+              </button>
+            </div>
+          </transition>
         </div>
         <!-- 标签页 -->
         <div class="flex items-center gap-1">
@@ -158,7 +189,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
 import CalcScreen from '@/components/CalcScreen.vue'
 import CalcKeyboard from '@/components/CalcKeyboard.vue'
 import GraphPanel from '@/components/GraphPanel.vue'
@@ -279,8 +310,34 @@ function onKey(e: KeyboardEvent) {
   else if (k === ',') pressKey(',')
 }
 
-onMounted(() => window.addEventListener('keydown', onKey))
-onUnmounted(() => window.removeEventListener('keydown', onKey))
+// ========== 语言菜单 ==========
+const langMenuOpen = ref(false)
+const currentLangInfo = computed(() => languages.find(l => l.code === lang.value) || languages[0])
+function pickLang(c: any) {
+  setLang(c)
+  try { localStorage.setItem('scp.lang', String(c)) } catch { /* ignore */ }
+  langMenuOpen.value = false
+}
+// 初始化语言
+try {
+  const saved = localStorage.getItem('scp.lang') as any
+  if (saved && languages.some(l => l.code === saved)) setLang(saved)
+} catch { /* ignore */ }
+
+function onClickOutsideLangMenu(e: MouseEvent) {
+  if (!langMenuOpen.value) return
+  const el = (e.target as HTMLElement)?.closest?.('[data-lang-root]')
+  if (!el) langMenuOpen.value = false
+}
+
+onMounted(() => {
+  window.addEventListener('keydown', onKey)
+  document.addEventListener('mousedown', onClickOutsideLangMenu)
+})
+onUnmounted(() => {
+  window.removeEventListener('keydown', onKey)
+  document.removeEventListener('mousedown', onClickOutsideLangMenu)
+})
 </script>
 
 <style scoped>

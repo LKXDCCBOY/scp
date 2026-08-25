@@ -10,9 +10,14 @@ export const lang = computed({
 })
 
 /** 支持的语言列表 */
-export const languages: { code: Lang; label: string }[] = [
-  { code: 'zh-CN', label: '中文' },
-  { code: 'en-US', label: 'EN' }
+export const languages: { code: Lang; label: string; flag: string }[] = [
+  { code: 'zh-CN', label: '简体中文', flag: '🇨🇳' },
+  { code: 'zh-TW', label: '繁體中文', flag: '🇭🇰' },
+  { code: 'en-US', label: 'English', flag: '🇺🇸' },
+  { code: 'ja-JP', label: '日本語', flag: '🇯🇵' },
+  { code: 'ru-RU', label: 'Русский', flag: '🇷🇺' },
+  { code: 'fr-FR', label: 'Français', flag: '🇫🇷' },
+  { code: 'de-DE', label: 'Deutsch', flag: '🇩🇪' }
 ]
 
 /** 翻译函数，支持点路径和插值 */

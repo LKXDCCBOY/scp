@@ -105,7 +105,7 @@ const exampleList = computed(() => ([
 // ---- 代码与输出 ----
 const code = ref<string>('')
 const outputEl = ref<HTMLElement>()
-const outputHtml = ref('<span class="text-white/30">' + t('python.script.hint') + '</span>')
+const outputHtml = ref('<span style="color: var(--text-muted)">' + t('python.script.hint') + '</span>')
 const running = ref(false)
 const example = ref('')
 
@@ -213,11 +213,24 @@ function loadExample() {
 }
 
 function clearOutput() {
-  outputHtml.value = '<span class="text-white/30">' + t('python.outputCleared') + '</span>'
+  outputHtml.value = `<span ${cs.dim}>` + t('python.outputCleared') + '</span>'
 }
 
 function escapeHtml(s: string): string {
   return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+}
+
+// 使用 CSS 变量颜色（同时适配暗/亮主题）
+const cs = {
+  stdout:   'style="color: var(--log-stdout)"',
+  dim:      'style="color: var(--text-muted)"',
+  muted:    'style="color: var(--text-dim)"',
+  err:      'style="color: var(--log-stderr)"',
+  info:     'style="color: var(--log-info)"',
+  ret:      'style="color: var(--log-return)"',
+  varName:  'style="color: var(--log-info)"',
+  warn:     'style="color: var(--key-special-text)"',
+  borderDim:'style="border-top: 1px solid var(--tab-divider)"'
 }
 
 function pushResult(html: string) {
@@ -242,22 +255,22 @@ function runMathScript() {
   const result = runScript(code.value, { angleMode: props.state.angleMode })
   const out: string[] = []
   result.output.forEach(line => {
-    out.push(`<span class="text-white/90">${escapeHtml(line)}</span>`)
+    out.push(`<span ${cs.stdout}>${escapeHtml(line)}</span>`)
   })
   if (result.error) {
-    out.push(`<span class="text-rose-400">${escapeHtml(result.error)}</span>`)
+    out.push(`<span ${cs.err}>${escapeHtml(result.error)}</span>`)
   }
   // 输出变量列表（摘要）
   const varKeys = Object.keys(result.vars).filter(k => !['pi', 'e'].includes(k))
   if (varKeys.length) {
     const vList = varKeys.slice(0, 12).map(k => {
       const v = result.vars[k]
-      return `<span class="text-cyan-300/90">${k}</span>=<span class="text-white/85">${escapeHtml(String(typeof v === 'number' ? (Number.isInteger(v) ? v : parseFloat(v.toPrecision(10))) : v))}</span>`
+      return `<span ${cs.varName}>${k}</span>=<span ${cs.stdout}>${escapeHtml(String(typeof v === 'number' ? (Number.isInteger(v) ? v : parseFloat(v.toPrecision(10))) : v))}</span>`
     }).join('  ')
-    out.push(`<div class="text-[11px] text-white/30 mt-2 pt-1 border-t border-white/5">VARS: ${vList}</div>`)
+    out.push(`<div class="text-[11px] mt-2 pt-1" ${cs.borderDim} ${cs.dim}>VARS: ${vList}</div>`)
   }
   if (out.length === 0) {
-    out.push('<span class="text-white/40">' + t('python.noOutput') + '</span>')
+    out.push(`<span ${cs.muted}>` + t('python.noOutput') + '</span>')
   }
   pushResult(out.join('\n'))
 }
@@ -284,25 +297,25 @@ async function checkNative() {
 
 async function runNative() {
   if (nativeStatus.value !== 'ok') {
-    pushResult(`<span class="text-rose-400">${t('python.native.none')}</span>`)
+    pushResult(`<span ${cs.err}>${t('python.native.none')}</span>`)
     return
   }
-  pushResult('<span class="text-amber-300/70">' + t('python.native.running') + '</span>')
+  pushResult(`<span ${cs.warn}>` + t('python.native.running') + '</span>')
   try {
     const res = await window.calcNative!.runPython(code.value)
     const lines: string[] = []
-    if (res.stdout) lines.push(`<span class="text-white/90">${escapeHtml(String(res.stdout))}</span>`)
+    if (res.stdout) lines.push(`<span ${cs.stdout}>${escapeHtml(String(res.stdout))}</span>`)
     if (res.stderr) {
       const last = String(res.stderr).trim().split('\n').filter(Boolean).slice(-1)[0] || String(res.stderr)
-      lines.push(`<span class="text-rose-400">${escapeHtml(last)}</span>`)
+      lines.push(`<span ${cs.err}>${escapeHtml(last)}</span>`)
     }
     if (res.ok === false && res.error) {
-      lines.push(`<span class="text-rose-400">${escapeHtml(res.error)}</span>`)
+      lines.push(`<span ${cs.err}>${escapeHtml(res.error)}</span>`)
     }
-    if (lines.length === 0) lines.push('<span class="text-white/40">' + t('python.noOutput') + '</span>')
+    if (lines.length === 0) lines.push(`<span ${cs.muted}>` + t('python.noOutput') + '</span>')
     pushResult(lines.join('\n'))
   } catch (e: any) {
-    pushResult(`<span class="text-rose-400">${escapeHtml(e?.message || String(e))}</span>`)
+    pushResult(`<span ${cs.err}>${escapeHtml(e?.message || String(e))}</span>`)
   }
 }
 
@@ -314,7 +327,7 @@ let pyodide: any = null
 async function loadPyodide() {
   if (pyoLoading.value) return
   pyoLoading.value = true
-  pushResult('<span class="text-amber-300/80">' + t('python.loadPrompt') + '</span>')
+  pushResult(`<span ${cs.warn}>` + t('python.loadPrompt') + '</span>')
   try {
     if (!(window as any).loadPyodide) {
       await loadScript('https://cdn.jsdelivr.net/pyodide/v0.26.2/full/pyodide.js')
@@ -323,9 +336,9 @@ async function loadPyodide() {
       indexURL: 'https://cdn.jsdelivr.net/pyodide/v0.26.2/full/'
     })
     pyoReady.value = true
-    pushResult('<span class="text-emerald-300/80">' + t('python.loadSuccess') + '</span>')
+    pushResult(`<span ${cs.ret}>` + t('python.loadSuccess') + '</span>')
   } catch (err: any) {
-    pushResult(`<span class="text-rose-400">${t('python.loadFail', { msg: err?.message || err })}</span>`)
+    pushResult(`<span ${cs.err}>${t('python.loadFail', { msg: err?.message || err })}</span>`)
   } finally {
     pyoLoading.value = false
   }
@@ -347,20 +360,20 @@ async function runPyodide() {
     if (!pyoReady.value) return
   }
   const lines: string[] = []
-  pyodide.setStdout({ batched: (s: string) => lines.push(`<span class="text-white/90">${escapeHtml(s)}</span>`) })
-  pyodide.setStderr({ batched: (s: string) => lines.push(`<span class="text-rose-400/80">${escapeHtml(s)}</span>`) })
+  pyodide.setStdout({ batched: (s: string) => lines.push(`<span ${cs.stdout}>${escapeHtml(s)}</span>`) })
+  pyodide.setStderr({ batched: (s: string) => lines.push(`<span ${cs.err}>${escapeHtml(s)}</span>`) })
   try {
     const result = await pyodide.runPythonAsync(code.value)
     if (result !== undefined && result !== null) {
-      lines.push(`<span class="text-emerald-300/80">${t('python.returnValue', { val: escapeHtml(String(result)) })}</span>`)
+      lines.push(`<span ${cs.ret}>${t('python.returnValue', { val: escapeHtml(String(result)) })}</span>`)
     }
   } catch (err: any) {
     const msg = String(err?.message || err)
     const lines2 = msg.split('\n').filter(l => l.trim())
     const lastLine = lines2[lines2.length - 1] || msg
-    lines.push(`<span class="text-rose-400">${escapeHtml(lastLine)}</span>`)
+    lines.push(`<span ${cs.err}>${escapeHtml(lastLine)}</span>`)
   } finally {
-    if (lines.length === 0) lines.push('<span class="text-white/40">' + t('python.noOutput') + '</span>')
+    if (lines.length === 0) lines.push(`<span ${cs.muted}>` + t('python.noOutput') + '</span>')
     pushResult(lines.join('\n'))
   }
 }
@@ -375,26 +388,26 @@ async function switchMode(m: ModeId) {
   }
   initDefaultCode()
   if (m === 'math') {
-    pushResult('<span class="text-emerald-300/80">' + t('python.script.ready') + ' · ' + t('python.script.hint') + '</span>')
+    pushResult(`<span ${cs.ret}>` + t('python.script.ready') + ' · ' + t('python.script.hint') + '</span>')
   } else if (m === 'native') {
     if (nativeStatus.value === 'ok') {
-      pushResult('<span class="text-emerald-300/80">' + t('python.native.ready') + (nativeVersion.value ? ' · ' + nativeVersion.value : '') + '</span>')
+      pushResult(`<span ${cs.ret}>` + t('python.native.ready') + (nativeVersion.value ? ' · ' + nativeVersion.value : '') + '</span>')
     } else {
       await checkNative()
       if (nativeStatus.value === 'ok') {
-        pushResult('<span class="text-emerald-300/80">' + t('python.native.ready') + ' · ' + nativeVersion.value + '</span>')
+        pushResult(`<span ${cs.ret}>` + t('python.native.ready') + ' · ' + nativeVersion.value + '</span>')
       } else {
-        pushResult(`<span class="text-rose-400">${t('python.native.none')}</span><div class="text-[11px] text-white/40 mt-1">${t('python.native.tip')}</div>`)
+        pushResult(`<span ${cs.err}>${t('python.native.none')}</span><div class="text-[11px] mt-1" ${cs.dim}>${t('python.native.tip')}</div>`)
       }
     }
   } else {
-    if (pyoReady.value) pushResult('<span class="text-emerald-300/80">' + t('python.ready') + '</span>')
-    else pushResult('<span class="text-white/40">' + t('python.pyodide.tip') + '</span>')
+    if (pyoReady.value) pushResult(`<span ${cs.ret}>` + t('python.ready') + '</span>')
+    else pushResult(`<span ${cs.dim}>` + t('python.pyodide.tip') + '</span>')
   }
 }
 
 onMounted(() => {
   // 启动模式为 math，输出就绪提示
-  pushResult('<span class="text-emerald-300/80">' + t('python.script.ready') + ' · ' + t('python.script.hint') + '</span>')
+  pushResult(`<span ${cs.ret}>` + t('python.script.ready') + ' · ' + t('python.script.hint') + '</span>')
 })
 </script>

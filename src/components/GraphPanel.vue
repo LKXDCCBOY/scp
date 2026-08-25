@@ -2,48 +2,83 @@
   <div :class="isFullscreen
     ? 'fixed inset-0 z-50 bg-slate-900/95 backdrop-blur-2xl p-4 flex flex-col min-h-0'
     : 'glass-panel p-3 sm:p-4 w-full h-full flex flex-col min-h-0'">
-    <!-- 工具栏 -->
-    <div class="flex-none flex items-center gap-2 mb-2 flex-wrap">
-      <span class="text-xs sm:text-sm font-medium text-white/70">{{ t('graph.title') }}</span>
-      <div class="flex-1"></div>
-      <button @click="resetView" class="text-[11px] px-2 py-1 rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 transition">{{ t('graph.resetView') }}</button>
-      <button @click="zoomBy(1.5)" class="text-[11px] px-2 py-1 rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 transition">{{ t('graph.zoomIn') }}</button>
-      <button @click="zoomBy(1/1.5)" class="text-[11px] px-2 py-1 rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 transition">{{ t('graph.zoomOut') }}</button>
-      <button @click="toggleFullscreen" class="text-[11px] px-2 py-1 rounded-lg bg-calc-primary/20 border border-calc-primary/40 hover:bg-calc-primary/30 transition flex items-center gap-1">
-        <svg v-if="!isFullscreen" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3M3 16v3a2 2 0 0 0 2 2h3m13-5v3a2 2 0 0 1-2 2h-3"/>
-        </svg>
-        <svg v-else viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M8 3v3a2 2 0 0 1-2 2H3m18 0h-3a2 2 0 0 1-2-2V3M3 16h3a2 2 0 0 1 2 2v3m13-5v3a2 2 0 0 0-2 2h-3"/>
-        </svg>
-        {{ isFullscreen ? t('graph.exitFullscreen') : t('graph.fullscreen') }}
-      </button>
-    </div>
+    <!-- 左上角菜单按钮（全屏时显示） -->
+    <button v-if="isFullscreen && !menuOpen"
+            @click="menuOpen = true"
+            class="absolute top-3 left-3 z-40 w-9 h-9 rounded-lg bg-black/40 border border-white/15 text-white/80 backdrop-blur-md
+                   flex items-center justify-center hover:bg-black/60 hover:scale-105 active:scale-95 transition">
+      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="3" y1="6" x2="21" y2="6"/>
+        <line x1="3" y1="12" x2="21" y2="12"/>
+        <line x1="3" y1="18" x2="21" y2="18"/>
+      </svg>
+    </button>
 
-    <!-- 函数输入列表 -->
-    <div class="flex-none space-y-1.5 mb-2 overflow-y-auto scrollbar-thin"
-         :class="isFullscreen ? 'max-h-[100px]' : 'max-h-[120px]'">
-      <div v-for="(f, i) in funcs" :key="i" class="flex items-center gap-1.5">
-        <span class="w-4 h-4 rounded-full flex-none border border-white/20" :style="{ background: f.color }"></span>
-        <span class="text-[11px] text-white/50 flex-none w-10">y =</span>
-        <input
-          v-model="f.expr"
-          @keyup.enter="redraw"
-          @blur="redraw"
-          @focus="router.onFocus"
-          @keydown.capture="router.onKeydownCapture"
-          :readonly="router.readonly"
-          class="flex-1 bg-black/30 border border-white/10 rounded-lg px-2 py-1 text-xs sm:text-sm
-                 font-mono focus:outline-none focus:border-calc-primary/60 text-white w-0 min-w-0"
-          :placeholder="t('graph.placeholder')"
-        />
-        <button @click="removeFunc(i)" class="text-[11px] text-rose-400/70 hover:text-rose-400 px-1 flex-none">x</button>
+    <!-- 下拉控制栏（全屏时从上方弹出） -->
+    <transition name="slide-down">
+      <div v-if="!isFullscreen || menuOpen"
+           class="flex-none relative z-40">
+        <!-- 控制栏外框（全屏时毛玻璃） -->
+        <div :class="isFullscreen ? 'rounded-xl bg-slate-900/85 border border-white/15 backdrop-blur-xl p-3 mb-2' : ''">
+          <!-- 工具栏 -->
+          <div class="flex-none flex items-center gap-2 mb-2 flex-wrap">
+            <span class="text-xs sm:text-sm font-medium" :style="{ color: 'var(--text-dim)' }">{{ t('graph.title') }}</span>
+            <div class="flex-1"></div>
+            <button @click="resetView"
+                    class="text-[11px] px-2 py-1 rounded-lg transition"
+                    :style="{ background: 'var(--chip-bg)', borderColor: 'var(--chip-border)', color: 'var(--text)' }"
+                    style="border-width:1px">{{ t('graph.resetView') }}</button>
+            <button @click="zoomBy(1.5)"
+                    class="text-[11px] px-2 py-1 rounded-lg transition"
+                    :style="{ background: 'var(--chip-bg)', borderColor: 'var(--chip-border)', color: 'var(--text)' }"
+                    style="border-width:1px">{{ t('graph.zoomIn') }}</button>
+            <button @click="zoomBy(1/1.5)"
+                    class="text-[11px] px-2 py-1 rounded-lg transition"
+                    :style="{ background: 'var(--chip-bg)', borderColor: 'var(--chip-border)', color: 'var(--text)' }"
+                    style="border-width:1px">{{ t('graph.zoomOut') }}</button>
+            <button @click="toggleFullscreen"
+                    class="text-[11px] px-2 py-1 rounded-lg transition flex items-center gap-1"
+                    :style="{ background: 'var(--primary-bg)', color: 'var(--primary-text)' }">
+              <svg v-if="!isFullscreen" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3M3 16v3a2 2 0 0 0 2 2h3m13-5v3a2 2 0 0 1-2 2h-3"/>
+              </svg>
+              <svg v-else viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M8 3v3a2 2 0 0 1-2 2H3m18 0h-3a2 2 0 0 1-2-2V3M3 16h3a2 2 0 0 1 2 2v3m13-5v3a2 2 0 0 0-2 2h-3"/>
+              </svg>
+              {{ isFullscreen ? t('graph.exitFullscreen') : t('graph.fullscreen') }}
+            </button>
+          </div>
+
+          <!-- 函数输入列表 -->
+          <div class="flex-none space-y-1.5 overflow-y-auto scrollbar-thin"
+               :class="isFullscreen ? 'max-h-[240px]' : 'max-h-[120px]'">
+            <div v-for="(f, i) in funcs" :key="i" class="flex items-center gap-1.5">
+              <span class="w-4 h-4 rounded-full flex-none border border-white/20" :style="{ background: f.color }"></span>
+              <span class="text-[11px] flex-none w-10" :style="{ color: 'var(--text-muted)' }">y =</span>
+              <input
+                v-model="f.expr"
+                @keyup.enter="redraw"
+                @blur="redraw"
+                @focus="router.onFocus"
+                @keydown.capture="router.onKeydownCapture"
+                :readonly="router.readonly"
+                class="flex-1 rounded-lg px-2 py-1 text-xs sm:text-sm
+                       font-mono focus:outline-none w-0 min-w-0"
+                :style="{ background: 'var(--input-bg)', borderColor: 'var(--input-border)', color: 'var(--input-text)' }"
+                style="border-width:1px"
+                :placeholder="t('graph.placeholder')"
+              />
+              <button @click="removeFunc(i)" class="text-[11px] text-rose-400/70 hover:text-rose-400 px-1 flex-none">x</button>
+            </div>
+            <button @click="addFunc" class="text-[11px] px-2 py-1" :style="{ color: 'var(--primary-text)' }">{{ t('graph.addFunc') }}</button>
+          </div>
+        </div>
       </div>
-      <button @click="addFunc" class="text-[11px] text-blue-300 hover:text-blue-200 px-2 py-1">{{ t('graph.addFunc') }}</button>
-    </div>
+    </transition>
 
     <!-- Canvas 绘图区 -->
-    <div class="flex-1 min-h-0 relative rounded-xl overflow-hidden border border-white/8 bg-black/40"
+    <div class="flex-1 min-h-0 relative rounded-xl overflow-hidden border"
+         :style="{ borderColor: 'var(--tab-divider)', background: 'var(--expr-bg)' }"
          ref="canvasWrap"
          @wheel.prevent="onWheel"
          @pointerdown="onPanStart"
@@ -52,14 +87,14 @@
          @pointerleave="onPanEnd">
       <canvas ref="canvas" class="absolute inset-0 w-full h-full"></canvas>
       <!-- 坐标显示 -->
-      <div class="absolute bottom-2 left-2 text-[11px] font-mono text-white/50 bg-black/40 rounded-lg px-2 py-1 pointer-events-none">
+      <div class="absolute bottom-2 left-2 text-[11px] font-mono bg-black/40 rounded-lg px-2 py-1 pointer-events-none text-white/70">
         {{ t('graph.coordLabel', { x: mouseX.toFixed(3), y: mouseY.toFixed(3) }) }}
       </div>
-      <div class="absolute top-2 left-2 text-[11px] font-mono text-white/50 bg-black/40 rounded-lg px-2 py-1 pointer-events-none">
+      <div class="absolute top-2 left-2 text-[11px] font-mono bg-black/40 rounded-lg px-2 py-1 pointer-events-none text-white/70">
         {{ t('graph.viewLabel', { scale: scale.toFixed(1), cx: centerX.toFixed(2), cy: centerY.toFixed(2) }) }}
       </div>
       <!-- 全屏退出提示 -->
-      <div v-if="isFullscreen" class="absolute top-2 right-2 text-[11px] font-mono text-white/40 bg-black/40 rounded-lg px-2 py-1 pointer-events-none">
+      <div v-if="isFullscreen" class="absolute top-2 right-2 text-[11px] font-mono bg-black/40 rounded-lg px-2 py-1 pointer-events-none text-white/60">
         Esc {{ t('graph.exitFullscreen') }}
       </div>
     </div>
@@ -80,6 +115,7 @@ const router = bindInputRouter()
 const canvas = ref<HTMLCanvasElement>()
 const canvasWrap = ref<HTMLElement>()
 const isFullscreen = ref(false)
+const menuOpen = ref(false)
 
 // 16 色调色板：覆盖全色谱、感知差异大、暗/亮主题下均可辨识
 const colors = [
@@ -136,6 +172,7 @@ function resetView() {
 
 function toggleFullscreen() {
   isFullscreen.value = !isFullscreen.value
+  menuOpen.value = false
   nextTick(() => {
     resizeCanvas()
     redraw()
@@ -143,12 +180,15 @@ function toggleFullscreen() {
 }
 
 function onEscKey(e: KeyboardEvent) {
-  if (e.key === 'Escape' && isFullscreen.value) {
-    isFullscreen.value = false
-    nextTick(() => {
-      resizeCanvas()
-      redraw()
-    })
+  if (e.key === 'Escape') {
+    if (menuOpen.value) { menuOpen.value = false; return }
+    if (isFullscreen.value) {
+      isFullscreen.value = false
+      nextTick(() => {
+        resizeCanvas()
+        redraw()
+      })
+    }
   }
 }
 
