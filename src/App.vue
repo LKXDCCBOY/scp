@@ -9,9 +9,11 @@
         <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-gradient-to-br from-blue-500/60 to-purple-500/60 border backdrop-blur-md
                     flex items-center justify-center shadow-glow animate-logo-pulse overflow-hidden flex-none"
              :style="{ borderColor: 'var(--chip-border)' }">
-          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="12" cy="12" r="9"/>
-            <path d="M12 6v6l4 2"/>
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="1.8" fill="white" stroke="none"/>
+            <ellipse cx="12" cy="12" rx="10" ry="3.5"/>
+            <ellipse cx="12" cy="12" rx="10" ry="3.5" transform="rotate(60 12 12)"/>
+            <ellipse cx="12" cy="12" rx="10" ry="3.5" transform="rotate(-60 12 12)"/>
           </svg>
         </div>
         <div class="min-w-0">
