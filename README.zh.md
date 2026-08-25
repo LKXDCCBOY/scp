@@ -1,6 +1,12 @@
 # SCP - 科学计算器 Plus
 
-[English](./README.md) | **中文**
+[![Languages](https://img.shields.io/badge/UI%20%E8%AF%AD%E8%A8%80-7-informational)](#)
+&nbsp;🇨🇳&nbsp;🇭🇰&nbsp;🇺🇸&nbsp;🇯🇵&nbsp;🇷🇺&nbsp;🇫🇷&nbsp;🇩🇪
+
+**文档语言:**
+[English](./README.md) | **简体中文** | 繁體中文 · 日本語 · Русский · Français · Deutsch
+
+> 界面语言切换入口：应用内顶部标题栏右侧 **Language** 下拉按钮（共 7 种语言）
 
 一款专业级科学计算器桌面应用，采用卡西欧风格软键盘、磨砂玻璃 UI、多主题支持，以及高级数学运算能力。
 
@@ -146,7 +152,9 @@ npm run android:apk
 
 ## 许可证
 
-MIT License — 见 [LICENSE](LICENSE) 文件。
+**GNU General Public License v3.0** — 完整条款请参见 [LICENSE](LICENSE) 文件。
+
+[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
 ## 关于
 

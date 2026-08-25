@@ -1,6 +1,12 @@
 # SCP - Scientific Calculator Plus
 
-**English** | [中文](./README.zh.md)
+[![Languages](https://img.shields.io/badge/UI%20Languages-7-informational)](#)
+&nbsp;🇨🇳&nbsp;🇭🇰&nbsp;🇺🇸&nbsp;🇯🇵&nbsp;🇷🇺&nbsp;🇫🇷&nbsp;🇩🇪
+
+**README:**
+**English** | [中文 (简体)](./README.zh.md) | 繁體中文 · 日本語 · Русский · Français · Deutsch
+
+> UI Language Switch: In-app top bar → **Language** dropdown (7 languages)
 
 A professional scientific calculator desktop application with a Casio-style soft keyboard, glassmorphism UI, multi-theme support, and advanced mathematical capabilities.
 
@@ -146,7 +152,9 @@ Pre-built binaries are available on the [Releases](../../releases) page:
 
 ## License
 
-MIT License — see [LICENSE](LICENSE) file.
+**GNU General Public License v3.0** — see the [LICENSE](LICENSE) file for full terms.
+
+[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
 ## About
 
