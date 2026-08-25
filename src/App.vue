@@ -9,12 +9,7 @@
         <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-gradient-to-br from-blue-500/60 to-purple-500/60 border backdrop-blur-md
                     flex items-center justify-center shadow-glow animate-logo-pulse overflow-hidden flex-none"
              :style="{ borderColor: 'var(--chip-border)' }">
-          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="12" cy="12" r="1.8" fill="white" stroke="none"/>
-            <ellipse cx="12" cy="12" rx="10" ry="3.5"/>
-            <ellipse cx="12" cy="12" rx="10" ry="3.5" transform="rotate(60 12 12)"/>
-            <ellipse cx="12" cy="12" rx="10" ry="3.5" transform="rotate(-60 12 12)"/>
-          </svg>
+          <img src="/logo.png" alt="Logo" width="18" height="18" class="flex-none" style="object-fit: contain; image-rendering: high-quality;"/>
         </div>
         <div class="min-w-0">
           <h1 class="text-xs sm:text-sm font-semibold tracking-wide leading-tight truncate" :style="{ color: 'var(--text)' }">{{ t('app.title') }}</h1>
@@ -51,9 +46,10 @@
             <line x1="12" y1="16" x2="12" y2="20"/>
           </svg>
         </button>
-        <!-- Language 按钮 + 下拉列表 -->
+        <!-- Language 按钮 + 下拉列表（Teleport 到 body 彻底避开 overflow / z-index 遮挡） -->
         <div class="relative" data-lang-root>
-          <button @click.stop="langMenuOpen = !langMenuOpen"
+          <button ref="langBtnRef"
+                  @click.stop="toggleLangMenu"
                   class="h-7 sm:h-8 px-2.5 rounded-lg flex items-center gap-1.5 border backdrop-blur-md transition hover:scale-105 active:scale-95"
                   :style="{ background: 'var(--chip-bg)', borderColor: 'var(--chip-border)', color: 'var(--text)' }">
             <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -68,12 +64,23 @@
               <polyline points="6 9 12 15 18 9"/>
             </svg>
           </button>
-          <!-- 下拉列表 -->
+        </div>
+        <!-- Teleport 到 body → fixed 定位，完全不受父容器 overflow / 堆叠上下文 影响 -->
+        <Teleport to="body">
           <transition name="slide-up">
             <div v-if="langMenuOpen"
+                 data-lang-menu
                  @click.stop
-                 class="absolute right-0 top-full mt-1.5 min-w-[180px] rounded-xl border backdrop-blur-2xl shadow-2xl p-1.5 z-[1000]"
-                 :style="{ background: 'var(--panel-bg)', borderColor: 'var(--chip-border)' }">
+                 class="fixed rounded-xl border backdrop-blur-2xl shadow-2xl p-1.5"
+                 :style="{
+                   top: langMenuPos.top + 'px',
+                   right: langMenuPos.right + 'px',
+                   width: langMenuPos.width + 'px',
+                   minWidth: '180px',
+                   zIndex: 99999,
+                   background: 'var(--panel-bg)',
+                   borderColor: 'var(--chip-border)'
+                 }">
               <button v-for="l in languages" :key="l.code"
                 @click="pickLang(l.code)"
                 class="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-left transition"
@@ -89,7 +96,7 @@
               </button>
             </div>
           </transition>
-        </div>
+        </Teleport>
         <!-- 标签页 -->
         <div class="flex items-center gap-1">
           <button v-for="tab in tabs" :key="tab.id"
@@ -191,7 +198,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
+import { ref, reactive, computed, onMounted, onUnmounted, watch } from 'vue'
 import CalcScreen from '@/components/CalcScreen.vue'
 import CalcKeyboard from '@/components/CalcKeyboard.vue'
 import GraphPanel from '@/components/GraphPanel.vue'
@@ -313,7 +320,26 @@ function onKey(e: KeyboardEvent) {
 }
 
 // ========== 语言菜单 ==========
+const langBtnRef = ref<HTMLButtonElement | null>(null)
 const langMenuOpen = ref(false)
+const langMenuPos = reactive({ top: 0, right: 0, width: 180 })
+
+function updateLangMenuPos() {
+  const btn = langBtnRef.value
+  if (!btn) return
+  const rect = btn.getBoundingClientRect()
+  const vw = window.innerWidth
+  // right = 距离视口右边缘的距离
+  langMenuPos.right = Math.max(8, vw - rect.right)
+  langMenuPos.top = Math.max(0, rect.bottom + 6)
+  langMenuPos.width = Math.max(180, rect.width)
+}
+
+function toggleLangMenu() {
+  langMenuOpen.value = !langMenuOpen.value
+  if (langMenuOpen.value) updateLangMenuPos()
+}
+
 const currentLangInfo = computed(() => languages.find(l => l.code === lang.value) || languages[0])
 function pickLang(c: any) {
   setLang(c)
@@ -328,17 +354,27 @@ try {
 
 function onClickOutsideLangMenu(e: MouseEvent) {
   if (!langMenuOpen.value) return
-  const el = (e.target as HTMLElement)?.closest?.('[data-lang-root]')
-  if (!el) langMenuOpen.value = false
+  const t = e.target as HTMLElement
+  const insideBtn = t?.closest?.('[data-lang-root]')
+  const insideMenu = t?.closest?.('[data-lang-menu]')
+  if (!insideBtn && !insideMenu) langMenuOpen.value = false
+}
+
+function onLangMenuReposition() {
+  if (langMenuOpen.value) updateLangMenuPos()
 }
 
 onMounted(() => {
   window.addEventListener('keydown', onKey)
   document.addEventListener('mousedown', onClickOutsideLangMenu)
+  window.addEventListener('resize', onLangMenuReposition)
+  window.addEventListener('scroll', onLangMenuReposition, true)
 })
 onUnmounted(() => {
   window.removeEventListener('keydown', onKey)
   document.removeEventListener('mousedown', onClickOutsideLangMenu)
+  window.removeEventListener('resize', onLangMenuReposition)
+  window.removeEventListener('scroll', onLangMenuReposition, true)
 })
 </script>
 
