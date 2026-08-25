@@ -72,7 +72,7 @@
           <transition name="slide-up">
             <div v-if="langMenuOpen"
                  @click.stop
-                 class="absolute right-0 top-full mt-1.5 min-w-[180px] rounded-xl border backdrop-blur-2xl shadow-2xl p-1.5 z-[100]"
+                 class="absolute right-0 top-full mt-1.5 min-w-[180px] rounded-xl border backdrop-blur-2xl shadow-2xl p-1.5 z-[1000]"
                  :style="{ background: 'var(--panel-bg)', borderColor: 'var(--chip-border)' }">
               <button v-for="l in languages" :key="l.code"
                 @click="pickLang(l.code)"
