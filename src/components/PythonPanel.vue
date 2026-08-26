@@ -2,31 +2,39 @@
   <div class="glass-panel p-3 sm:p-4 w-full h-full flex flex-col min-h-0">
     <!-- 工具栏：标题 + 模式切换 + 状态 + 按钮 -->
     <div class="flex-none flex flex-wrap items-center gap-2 mb-2">
-      <span class="text-xs sm:text-sm font-medium text-white/70">{{ t('python.title') }}</span>
+      <span class="text-xs sm:text-sm font-medium" :style="{ color: 'var(--py-title)' }">{{ t('python.title') }}</span>
       <!-- 模式切换 -->
-      <div class="flex items-center gap-0.5 bg-white/5 rounded-md border border-white/10 p-0.5">
+      <div class="flex items-center gap-0.5 rounded-md border p-0.5"
+           :style="{ background: 'var(--py-bg-chip)', borderColor: 'var(--py-border-subtle)' }">
         <button v-for="m in modes" :key="m.id"
           @click="switchMode(m.id)"
           class="text-[10px] sm:text-[11px] px-2 py-1 rounded transition"
-          :class="mode === m.id ? 'bg-calc-primary/30 text-blue-200' : 'text-white/50 hover:text-white/80'">
+          :style="mode === m.id
+            ? { background: 'var(--py-bg-chip-active)', color: 'var(--py-text-mode-active)' }
+            : { color: 'var(--py-text-mode-inactive)' }">
           {{ m.label }}
         </button>
       </div>
       <!-- 状态 -->
-      <span v-if="mode==='math'" class="text-[11px] text-emerald-300/80">{{ t('python.script.ready') }}</span>
-      <span v-else-if="mode==='native' && nativeStatus==='ok'" class="text-[11px] text-emerald-300/80">{{ nativeVersion || t('python.native.ok') }}</span>
-      <span v-else-if="mode==='native' && nativeStatus==='checking'" class="text-[11px] text-amber-300/80">{{ t('python.native.checking') }}</span>
-      <span v-else-if="mode==='native' && nativeStatus==='none'" class="text-[11px] text-rose-300/80">{{ t('python.native.none') }}</span>
-      <span v-else-if="mode==='pyodide' && !pyoReady && !pyoLoading" class="text-[11px] text-rose-300/80">{{ t('python.notLoaded') }}</span>
-      <span v-else-if="mode==='pyodide' && pyoLoading" class="text-[11px] text-amber-300/80">{{ t('python.loading') }}</span>
-      <span v-else-if="mode==='pyodide'" class="text-[11px] text-emerald-300/80">{{ t('python.ready') }}</span>
+      <span v-if="mode==='math'" class="text-[11px]" :style="{ color: 'var(--py-text-status-ok)' }">{{ t('python.script.ready') }}</span>
+      <span v-else-if="mode==='native' && nativeStatus==='ok'" class="text-[11px]" :style="{ color: 'var(--py-text-status-ok)' }">{{ nativeVersion || t('python.native.ok') }}</span>
+      <span v-else-if="mode==='native' && nativeStatus==='checking'" class="text-[11px]" :style="{ color: 'var(--py-text-status-checking)' }">{{ t('python.native.checking') }}</span>
+      <span v-else-if="mode==='native' && nativeStatus==='none'" class="text-[11px]" :style="{ color: 'var(--py-text-status-error)' }">{{ t('python.native.none') }}</span>
+      <span v-else-if="mode==='pyodide' && !pyoReady && !pyoLoading" class="text-[11px]" :style="{ color: 'var(--py-text-status-error)' }">{{ t('python.notLoaded') }}</span>
+      <span v-else-if="mode==='pyodide' && pyoLoading" class="text-[11px]" :style="{ color: 'var(--py-text-status-loading)' }">{{ t('python.loading') }}</span>
+      <span v-else-if="mode==='pyodide'" class="text-[11px]" :style="{ color: 'var(--py-text-status-ok)' }">{{ t('python.ready') }}</span>
 
       <div class="flex-1"></div>
       <button v-if="mode==='pyodide'" @click="loadPyodide" :disabled="pyoLoading"
-              class="text-[11px] px-2 py-1 rounded-lg bg-calc-primary/20 border border-calc-primary/30 text-blue-200 hover:bg-calc-primary/30 transition disabled:opacity-50">
+              class="text-[11px] px-2 py-1 rounded-lg border transition disabled:opacity-50 hover:scale-105 active:scale-95"
+              :style="{ background: 'var(--py-bg-chip-active)', borderColor: 'var(--chip-active-border)', color: 'var(--py-text-mode-active)' }">
         {{ pyoReady ? t('python.reload') : t('python.load') }}
       </button>
-      <button @click="clearOutput" class="text-[11px] px-2 py-1 rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 transition">{{ t('python.clear') }}</button>
+      <button @click="clearOutput"
+              class="text-[11px] px-2 py-1 rounded-lg border transition hover:scale-105 active:scale-95"
+              :style="{ background: 'var(--py-bg-btn)', borderColor: 'var(--py-border-subtle)', color: 'var(--py-text-btn)' }">
+        {{ t('python.clear') }}
+      </button>
     </div>
 
     <!-- 代码 + 输出 -->
@@ -34,14 +42,17 @@
       <!-- 编辑 -->
       <div class="flex-none flex flex-col gap-1.5">
         <div class="flex items-center gap-1.5">
-          <span class="text-[11px] text-white/40 flex-none">{{ t('python.editor') }}</span>
+          <span class="text-[11px]" :style="{ color: 'var(--py-label)' }">{{ t('python.editor') }}</span>
           <div class="flex-1"></div>
-          <select v-model="example" @change="loadExample" class="text-[11px] bg-black/30 border border-white/10 rounded-lg px-1.5 py-1 text-white/70 focus:outline-none">
+          <select v-model="example" @change="loadExample"
+                  class="text-[11px] border rounded-lg px-1.5 py-1 focus:outline-none"
+                  :style="{ background: 'var(--py-bg-input)', borderColor: 'var(--py-border-subtle)', color: 'var(--py-text-select)' }">
             <option value="">{{ t('python.example') }}</option>
             <option v-for="e in exampleList" :key="e.id" :value="e.id">{{ e.label }}</option>
           </select>
           <button @click="runCode" :disabled="running || !canRun"
-                  class="text-[11px] px-3 py-1 rounded-lg bg-emerald-500/20 border border-emerald-400/30 text-emerald-200 hover:bg-emerald-500/30 transition disabled:opacity-40">
+                  class="text-[11px] px-3 py-1 rounded-lg border transition hover:scale-105 active:scale-95 disabled:opacity-40"
+                  :style="{ background: 'var(--py-btn-run-bg)', borderColor: 'var(--py-btn-run-text)', color: 'var(--py-btn-run-text)' }">
             {{ running ? t('python.running') : t('python.run') }}
           </button>
         </div>
@@ -49,9 +60,9 @@
           v-model="code"
           @keydown.ctrl.enter.prevent="runCode"
           @keydown.meta.enter.prevent="runCode"
-          class="w-full h-[100px] bg-black/30 border border-white/10 rounded-xl px-3 py-2 text-xs sm:text-sm
-                 font-mono text-white resize-none focus:outline-none focus:border-calc-primary/60
-                 scrollbar-thin leading-relaxed"
+          class="w-full h-[100px] border rounded-xl px-3 py-2 text-xs sm:text-sm
+                 font-mono resize-none focus:outline-none scrollbar-thin leading-relaxed transition-colors"
+          :style="{ background: 'var(--py-bg-input)', borderColor: 'var(--py-border-subtle)', color: 'var(--input-text)' }"
           :placeholder="placeholderText"
           spellcheck="false"
         ></textarea>
@@ -59,10 +70,11 @@
 
       <!-- 输出 -->
       <div class="flex-1 min-h-0 flex flex-col">
-        <span class="text-[11px] text-white/40 mb-1">{{ t('python.output') }}</span>
+        <span class="text-[11px] mb-1" :style="{ color: 'var(--py-label)' }">{{ t('python.output') }}</span>
         <div ref="outputEl"
-             class="flex-1 min-h-0 overflow-y-auto scrollbar-thin bg-black/40 border border-white/8 rounded-xl px-3 py-2
+             class="flex-1 min-h-0 overflow-y-auto scrollbar-thin border rounded-xl px-3 py-2
                     font-mono text-xs sm:text-sm leading-relaxed"
+             :style="{ background: 'var(--log-bg)', borderColor: 'var(--py-border-subtle)', color: 'var(--text)' }"
              v-html="outputHtml">
         </div>
       </div>

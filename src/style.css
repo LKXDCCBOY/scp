@@ -93,6 +93,27 @@
   --log-stderr: #fca5a5;
   --log-info: #93c5fd;
   --log-return: #86efac;
+
+  --py-title: rgba(255, 255, 255, 0.88);
+  --py-label: rgba(255, 255, 255, 0.45);
+  --py-bg-input: rgba(0, 0, 0, 0.35);
+  --py-bg-output: rgba(0, 0, 0, 0.5);
+  --py-bg-chip: rgba(255, 255, 255, 0.05);
+  --py-bg-chip-active: rgba(79, 140, 255, 0.28);
+  --py-bg-btn: rgba(255, 255, 255, 0.06);
+  --py-text-btn: rgba(255, 255, 255, 0.75);
+  --py-text-mode-active: #93c5fd;
+  --py-text-mode-inactive: rgba(255, 255, 255, 0.5);
+  --py-text-status-ok: rgba(52, 211, 153, 0.85);
+  --py-text-status-checking: rgba(251, 191, 36, 0.85);
+  --py-text-status-error: rgba(251, 113, 133, 0.85);
+  --py-text-status-loading: rgba(251, 191, 36, 0.85);
+  --py-border-subtle: rgba(255, 255, 255, 0.1);
+  --py-btn-run-bg: rgba(16, 185, 129, 0.18);
+  --py-btn-run-text: #6ee7b7;
+  --py-border-dim: rgba(255, 255, 255, 0.08);
+  --py-text-select: rgba(255, 255, 255, 0.75);
+  --py-text-dim: rgba(255, 255, 255, 0.4);
 }
 
 /* ====== 明亮主题 ====== */
@@ -186,6 +207,27 @@
   --log-stderr: #b91c1c;
   --log-info: #1d4ed8;
   --log-return: #15803d;
+
+  --py-title: #0f172a;
+  --py-label: rgba(15, 23, 42, 0.5);
+  --py-bg-input: rgba(255, 255, 255, 0.9);
+  --py-bg-output: rgba(255, 255, 255, 0.95);
+  --py-bg-chip: rgba(15, 23, 42, 0.04);
+  --py-bg-chip-active: rgba(79, 140, 255, 0.2);
+  --py-bg-btn: rgba(15, 23, 42, 0.05);
+  --py-text-btn: rgba(15, 23, 42, 0.7);
+  --py-text-mode-active: #1d4ed8;
+  --py-text-mode-inactive: rgba(15, 23, 42, 0.5);
+  --py-text-status-ok: #15803d;
+  --py-text-status-checking: #b45309;
+  --py-text-status-error: #be123c;
+  --py-text-status-loading: #b45309;
+  --py-border-subtle: rgba(15, 23, 42, 0.1);
+  --py-btn-run-bg: rgba(16, 185, 129, 0.15);
+  --py-btn-run-text: #059669;
+  --py-border-dim: rgba(15, 23, 42, 0.08);
+  --py-text-select: rgba(15, 23, 42, 0.75);
+  --py-text-dim: rgba(15, 23, 42, 0.4);
 }
 
 @layer base {
