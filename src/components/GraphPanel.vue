@@ -72,6 +72,63 @@
             </div>
             <button @click="addFunc" class="text-[11px] px-2 py-1" :style="{ color: 'var(--primary-text)' }">{{ t('graph.addFunc') }}</button>
           </div>
+
+          <!-- 模式切换栏 -->
+          <div class="flex-none flex items-center gap-1.5 mt-2 flex-wrap">
+            <button @click="toolMode = 'function'; scheduleRedraw()"
+                    class="text-[10px] px-2.5 py-1 rounded-lg border transition"
+                    :style="toolMode === 'function'
+                      ? { background: 'var(--primary-bg)', borderColor: 'var(--primary-text)', color: 'var(--primary-text)' }
+                      : { background: 'var(--chip-bg)', borderColor: 'var(--chip-border)', color: 'var(--text-muted)' }"
+                    style="border-width:1px">Function</button>
+            <button @click="toolMode = 'draw'; scheduleRedraw()"
+                    class="text-[10px] px-2.5 py-1 rounded-lg border transition"
+                    :style="toolMode === 'draw'
+                      ? { background: 'var(--primary-bg)', borderColor: 'var(--primary-text)', color: 'var(--primary-text)' }
+                      : { background: 'var(--chip-bg)', borderColor: 'var(--chip-border)', color: 'var(--text-muted)' }"
+                    style="border-width:1px">Draw</button>
+            <button @click="toolMode = 'construct'; constructStep = 0; tempP1 = null; selectedRefIdx = -1; scheduleRedraw()"
+                    class="text-[10px] px-2.5 py-1 rounded-lg border transition"
+                    :style="toolMode === 'construct'
+                      ? { background: 'var(--primary-bg)', borderColor: 'var(--primary-text)', color: 'var(--primary-text)' }
+                      : { background: 'var(--chip-bg)', borderColor: 'var(--chip-border)', color: 'var(--text-muted)' }"
+                    style="border-width:1px">Construct</button>
+
+            <!-- 涂鸦控件 -->
+            <template v-if="toolMode === 'draw'">
+              <div class="flex items-center gap-1 ml-2">
+                <button v-for="c in drawColors" :key="c" @click="drawColor = c"
+                        class="w-5 h-5 rounded-full border transition"
+                        :style="{ background: c, borderColor: drawColor === c ? '#fff' : 'rgba(255,255,255,0.2)', transform: drawColor === c ? 'scale(1.2)' : 'none' }">
+                </button>
+              </div>
+              <input type="range" min="1" max="8" step="0.5" v-model.number="drawWidth"
+                     class="w-20 h-4 accent-blue-400" />
+              <span class="text-[10px]" :style="{ color: 'var(--text-muted)' }">{{ drawWidth }}px</span>
+              <button @click="sketches = []; scheduleRedraw()"
+                      class="text-[10px] px-2 py-1 rounded-lg border transition"
+                      :style="{ background: 'var(--chip-bg)', borderColor: 'var(--chip-border)', color: 'var(--text-muted)' }"
+                      style="border-width:1px">Clear</button>
+            </template>
+
+            <!-- 构造工具栏 -->
+            <template v-if="toolMode === 'construct'">
+              <div class="flex items-center gap-1 ml-2 flex-wrap">
+                <button v-for="t in constructTools" :key="t.id"
+                        @click="constructTool = t.id; constructStep = 0; tempP1 = null; selectedRefIdx = -1"
+                        class="text-[10px] px-2 py-1 rounded-lg border transition"
+                        :style="constructTool === t.id
+                          ? { background: 'var(--primary-bg)', borderColor: 'var(--primary-text)', color: 'var(--primary-text)' }
+                          : { background: 'var(--chip-bg)', borderColor: 'var(--chip-border)', color: 'var(--text-muted)' }"
+                        style="border-width:1px">{{ t.label }}</button>
+              </div>
+              <span class="text-[10px]" :style="{ color: 'var(--text-muted)' }">{{ constructHint }}</span>
+              <button @click="geoObjects = []; geoLabelIdx = 1; scheduleRedraw()"
+                      class="text-[10px] px-2 py-1 rounded-lg border transition"
+                      :style="{ background: 'var(--chip-bg)', borderColor: 'var(--chip-border)', color: 'var(--text-muted)' }"
+                      style="border-width:1px">Clear</button>
+            </template>
+          </div>
         </div>
       </div>
     </transition>
@@ -102,7 +159,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted, onUnmounted, nextTick } from 'vue'
+import { ref, reactive, computed, onMounted, onUnmounted, nextTick } from 'vue'
 import { evaluate, type EngineState, type AngleMode } from '@/engine/calculator'
 import { useInputRouter } from '@/composables/useInputRouter'
 import { t } from '@/i18n'
@@ -150,6 +207,70 @@ const centerY = ref(0)
 const scale = ref(40) // 像素/单位
 const mouseX = ref(0)
 const mouseY = ref(0)
+
+// ---- 模式系统 ----
+type ToolMode = 'function' | 'draw' | 'construct'
+const toolMode = ref<ToolMode>('function')
+
+// ---- 涂鸦 ----
+interface SketchStroke {
+  points: [number, number][] // 数学坐标
+  color: string
+  width: number
+}
+const sketches = ref<SketchStroke[]>([])
+const drawColor = ref('#4f8cff')
+const drawWidth = ref(2.5)
+let currentStroke: SketchStroke | null = null
+
+// ---- 几何构造 ----
+type ConstructTool = 'point' | 'line' | 'segment' | 'parallel' | 'perp' | 'intersection'
+const constructTool = ref<ConstructTool>('point')
+interface GeoPoint { type: 'point'; x: number; y: number; label: string }
+interface GeoLine { type: 'line'; x1: number; y1: number; x2: number; y2: number; label: string }
+interface GeoSegment { type: 'segment'; x1: number; y1: number; x2: number; y2: number; label: string }
+interface GeoParallel { type: 'parallel'; refIdx: number; px: number; py: number; label: string }
+interface GeoPerp { type: 'perp'; refIdx: number; px: number; py: number; label: string }
+interface GeoIntersection { type: 'intersection'; funcA: number; funcB: number; x: number; y: number; label: string }
+type GeoObj = GeoPoint | GeoLine | GeoSegment | GeoParallel | GeoPerp | GeoIntersection
+const geoObjects = ref<GeoObj[]>([])
+let geoLabelIdx = 1
+// 构造步骤状态
+let constructing = false
+let constructStep = 0 // 0=第一步, 1=第二步
+let tempP1: [number, number] | null = null
+// 构造中选中的参考对象（用于平行/垂线）
+let selectedRefIdx = -1
+
+// 涂鸦颜色选项
+const drawColors = ['#4f8cff', '#f43f5e', '#10b981', '#f59e0b', '#a855f7', '#06b6d4', '#ec4899', '#ffffff']
+
+// 构造工具列表
+const constructTools: { id: ConstructTool; label: string }[] = [
+  { id: 'point', label: 'Point' },
+  { id: 'line', label: 'Line' },
+  { id: 'segment', label: 'Segment' },
+  { id: 'parallel', label: 'Parallel' },
+  { id: 'perp', label: 'Perpendicular' },
+  { id: 'intersection', label: 'Intersect' }
+]
+
+const constructHint = computed(() => {
+  if (constructTool.value === 'point') return 'Click to place a point'
+  if (constructTool.value === 'line' || constructTool.value === 'segment') {
+    return constructStep === 0 ? 'Click first point' : 'Click second point'
+  }
+  if (constructTool.value === 'parallel') {
+    return constructStep === 0 ? 'Click near a line/segment' : 'Click point to pass through'
+  }
+  if (constructTool.value === 'perp') {
+    return constructStep === 0 ? 'Click near a line/segment' : 'Click point to pass through'
+  }
+  if (constructTool.value === 'intersection') {
+    return constructStep === 0 ? 'Click near first function' : 'Click near second function'
+  }
+  return ''
+})
 
 let cw = 0, ch = 0
 let ctx: CanvasRenderingContext2D | null = null
@@ -216,6 +337,23 @@ let panStartX = 0, panStartY = 0
 let panCenterX = 0, panCenterY = 0
 
 function onPanStart(e: PointerEvent) {
+  const rect = canvasWrap.value!.getBoundingClientRect()
+  const px = e.clientX - rect.left
+  const py = e.clientY - rect.top
+  const [mx, my] = pxToMath(px, py)
+
+  if (toolMode.value === 'draw') {
+    // 涂鸦模式：开始新笔画
+    currentStroke = { points: [[mx, my]], color: drawColor.value, width: drawWidth.value }
+    return
+  }
+
+  if (toolMode.value === 'construct') {
+    handleConstructClick(mx, my)
+    return
+  }
+
+  // 函数模式：平移
   panning = true
   panStartX = e.clientX
   panStartY = e.clientY
@@ -229,6 +367,14 @@ function onPanMove(e: PointerEvent) {
   const py = e.clientY - rect.top
   mouseX.value = (px - cw / 2) / scale.value + centerX.value
   mouseY.value = -(py - ch / 2) / scale.value + centerY.value
+
+  if (toolMode.value === 'draw' && currentStroke) {
+    const [mx, my] = pxToMath(px, py)
+    currentStroke.points.push([mx, my])
+    scheduleRedraw()
+    return
+  }
+
   if (!panning) return
   const dx = e.clientX - panStartX
   const dy = e.clientY - panStartY
@@ -238,7 +384,148 @@ function onPanMove(e: PointerEvent) {
 }
 
 function onPanEnd() {
+  if (toolMode.value === 'draw' && currentStroke) {
+    if (currentStroke.points.length > 1) {
+      sketches.value.push(currentStroke)
+    }
+    currentStroke = null
+    scheduleRedraw()
+    return
+  }
   panning = false
+}
+
+// ---- 构造逻辑 ----
+function handleConstructClick(mx: number, my: number) {
+  const tool = constructTool.value
+  if (tool === 'point') {
+    geoObjects.value.push({ type: 'point', x: mx, y: my, label: `P${geoLabelIdx++}` })
+    scheduleRedraw()
+    return
+  }
+  if (tool === 'line' || tool === 'segment') {
+    if (constructStep === 0) {
+      tempP1 = [mx, my]
+      constructStep = 1
+    } else if (tempP1) {
+      geoObjects.value.push({
+        type: tool, x1: tempP1[0], y1: tempP1[1], x2: mx, y2: my,
+        label: `L${geoLabelIdx++}`
+      })
+      tempP1 = null
+      constructStep = 0
+    }
+    scheduleRedraw()
+    return
+  }
+  if (tool === 'parallel' || tool === 'perp') {
+    // 第一步：选择参考直线/线段
+    // 第二步：选择经过的点
+    if (constructStep === 0) {
+      // 找最近的线/线段
+      const idx = findNearestLine(mx, my)
+      if (idx >= 0) {
+        selectedRefIdx = idx
+        constructStep = 1
+      }
+    } else if (selectedRefIdx >= 0) {
+      geoObjects.value.push({
+        type: tool, refIdx: selectedRefIdx, px: mx, py: my,
+        label: `${tool === 'parallel' ? 'Par' : 'Perp'}${geoLabelIdx++}`
+      })
+      selectedRefIdx = -1
+      constructStep = 0
+    }
+    scheduleRedraw()
+    return
+  }
+  if (tool === 'intersection') {
+    // 选择两个函数，计算交点
+    if (constructStep === 0) {
+      const idx = findNearestFunc(mx, my)
+      if (idx >= 0) { selectedRefIdx = idx; constructStep = 1 }
+    } else if (selectedRefIdx >= 0) {
+      const idx2 = findNearestFunc(mx, my)
+      if (idx2 >= 0 && idx2 !== selectedRefIdx) {
+        const pt = computeFuncIntersection(selectedRefIdx, idx2)
+        if (pt) {
+          geoObjects.value.push({
+            type: 'intersection', funcA: selectedRefIdx, funcB: idx2,
+            x: pt[0], y: pt[1], label: `I${geoLabelIdx++}`
+          })
+        }
+      }
+      selectedRefIdx = -1
+      constructStep = 0
+    }
+    scheduleRedraw()
+    return
+  }
+}
+
+function findNearestLine(mx: number, my: number): number {
+  let bestIdx = -1
+  let bestDist = 0.5 // 0.5 单位以内
+  geoObjects.value.forEach((obj, i) => {
+    if (obj.type !== 'line' && obj.type !== 'segment') return
+    const d = distPointToSegment(mx, my, obj.x1, obj.y1, obj.x2, obj.y2)
+    if (d < bestDist) { bestDist = d; bestIdx = i }
+  })
+  return bestIdx
+}
+
+function findNearestFunc(mx: number, my: number): number {
+  let bestIdx = -1
+  let bestDist = 0.5
+  funcs.forEach((f, i) => {
+    if (!f.expr.trim()) return
+    const fy = evalFunc(f.expr, mx, props.state.angleMode)
+    if (isFinite(fy) && Math.abs(fy - my) < bestDist) {
+      bestDist = Math.abs(fy - my)
+      bestIdx = i
+    }
+  })
+  return bestIdx
+}
+
+function distPointToSegment(px: number, py: number, x1: number, y1: number, x2: number, y2: number): number {
+  const dx = x2 - x1, dy = y2 - y1
+  const len2 = dx * dx + dy * dy
+  if (len2 < 1e-12) return Math.hypot(px - x1, py - y1)
+  let t = ((px - x1) * dx + (py - y1) * dy) / len2
+  t = Math.max(0, Math.min(1, t))
+  return Math.hypot(px - (x1 + t * dx), py - (y1 + t * dy))
+}
+
+function computeFuncIntersection(idxA: number, idxB: number): [number, number] | null {
+  const fA = funcs[idxA], fB = funcs[idxB]
+  if (!fA?.expr?.trim() || !fB?.expr?.trim()) return null
+  // 数值扫描：在可视范围内采样，找到符号变化的区间，然后二分
+  const [xMin] = pxToMath(0, 0)
+  const [xMax] = pxToMath(cw, 0)
+  const samples = 500
+  const dx = (xMax - xMin) / samples
+  let prevDiff = evalFunc(fA.expr, xMin, props.state.angleMode) - evalFunc(fB.expr, xMin, props.state.angleMode)
+  for (let i = 1; i <= samples; i++) {
+    const x = xMin + i * dx
+    const diff = evalFunc(fA.expr, x, props.state.angleMode) - evalFunc(fB.expr, x, props.state.angleMode)
+    if (isFinite(prevDiff) && isFinite(diff) && prevDiff * diff < 0) {
+      // 二分法精确化
+      let lo = x - dx, hi = x
+      for (let j = 0; j < 50; j++) {
+        const mid = (lo + hi) / 2
+        const dm = evalFunc(fA.expr, mid, props.state.angleMode) - evalFunc(fB.expr, mid, props.state.angleMode)
+        if (!isFinite(dm)) break
+        if (dm * prevDiff < 0) hi = mid
+        else { lo = mid; prevDiff = dm }
+      }
+      const xi = (lo + hi) / 2
+      const yi = evalFunc(fA.expr, xi, props.state.angleMode)
+      if (isFinite(xi) && isFinite(yi)) return [xi, yi]
+    }
+    prevDiff = diff
+  }
+  return null
 }
 
 function resizeCanvas() {
@@ -390,6 +677,118 @@ function drawFunc(f: FuncDef) {
   ctx.shadowBlur = 0
 }
 
+function drawSketches() {
+  if (!ctx) return
+  const all = currentStroke ? [...sketches.value, currentStroke] : sketches.value
+  for (const s of all) {
+    if (s.points.length < 2) continue
+    ctx.strokeStyle = s.color
+    ctx.lineWidth = s.width
+    ctx.lineJoin = 'round'
+    ctx.lineCap = 'round'
+    ctx.beginPath()
+    const [sx, sy] = mathToPx(s.points[0][0], s.points[0][1])
+    ctx.moveTo(sx, sy)
+    for (let i = 1; i < s.points.length; i++) {
+      const [px, py] = mathToPx(s.points[i][0], s.points[i][1])
+      ctx.lineTo(px, py)
+    }
+    ctx.stroke()
+  }
+}
+
+function drawGeoObjects() {
+  if (!ctx) return
+  ctx.font = '12px JetBrains Mono, monospace'
+  ctx.textAlign = 'left'
+  ctx.textBaseline = 'middle'
+
+  for (const obj of geoObjects.value) {
+    if (obj.type === 'point') {
+      const [px, py] = mathToPx(obj.x, obj.y)
+      ctx.fillStyle = '#fbbf24'
+      ctx.beginPath(); ctx.arc(px, py, 4, 0, Math.PI * 2); ctx.fill()
+      ctx.strokeStyle = 'rgba(255,255,255,0.5)'; ctx.lineWidth = 1; ctx.stroke()
+      ctx.fillStyle = 'rgba(255,255,255,0.8)'
+      ctx.fillText(obj.label, px + 7, py - 7)
+    } else if (obj.type === 'line') {
+      // 延长到屏幕边界
+      const dx = obj.x2 - obj.x1, dy = obj.y2 - obj.y1
+      const len = Math.hypot(dx, dy)
+      if (len < 1e-12) continue
+      const ux = dx / len, uy = dy / len
+      const far = Math.max(cw, ch) / scale.value * 2
+      const [px1, py1] = mathToPx(obj.x1 - ux * far, obj.y1 - uy * far)
+      const [px2, py2] = mathToPx(obj.x1 + ux * far, obj.y1 + uy * far)
+      ctx.strokeStyle = '#60a5fa'; ctx.lineWidth = 1.5
+      ctx.beginPath(); ctx.moveTo(px1, py1); ctx.lineTo(px2, py2); ctx.stroke()
+      const [lx, ly] = mathToPx((obj.x1 + obj.x2) / 2, (obj.y1 + obj.y2) / 2)
+      ctx.fillStyle = 'rgba(255,255,255,0.8)'; ctx.fillText(obj.label, lx + 5, ly)
+    } else if (obj.type === 'segment') {
+      const [px1, py1] = mathToPx(obj.x1, obj.y1)
+      const [px2, py2] = mathToPx(obj.x2, obj.y2)
+      ctx.strokeStyle = '#34d399'; ctx.lineWidth = 2
+      ctx.beginPath(); ctx.moveTo(px1, py1); ctx.lineTo(px2, py2); ctx.stroke()
+      // 端点
+      ctx.fillStyle = 'rgba(52,211,153,0.8)'
+      ctx.beginPath(); ctx.arc(px1, py1, 3, 0, Math.PI * 2); ctx.fill()
+      ctx.beginPath(); ctx.arc(px2, py2, 3, 0, Math.PI * 2); ctx.fill()
+      ctx.fillStyle = 'rgba(255,255,255,0.8)'
+      ctx.fillText(obj.label, (px1 + px2) / 2 + 5, (py1 + py2) / 2)
+    } else if (obj.type === 'parallel') {
+      const ref = geoObjects.value[obj.refIdx]
+      if (!ref || (ref.type !== 'line' && ref.type !== 'segment')) continue
+      const dx = ref.x2 - ref.x1, dy = ref.y2 - ref.y1
+      const len = Math.hypot(dx, dy)
+      if (len < 1e-12) continue
+      const ux = dx / len, uy = dy / len
+      const far = Math.max(cw, ch) / scale.value * 2
+      const [px1, py1] = mathToPx(obj.px - ux * far, obj.py - uy * far)
+      const [px2, py2] = mathToPx(obj.px + ux * far, obj.py + uy * far)
+      ctx.strokeStyle = '#a855f7'; ctx.lineWidth = 1.5; ctx.setLineDash([6, 4])
+      ctx.beginPath(); ctx.moveTo(px1, py1); ctx.lineTo(px2, py2); ctx.stroke()
+      ctx.setLineDash([])
+      const [lx, ly] = mathToPx(obj.px, obj.py)
+      ctx.fillStyle = '#a855f7'; ctx.beginPath(); ctx.arc(lx, ly, 3, 0, Math.PI * 2); ctx.fill()
+      ctx.fillStyle = 'rgba(255,255,255,0.8)'; ctx.fillText(obj.label, lx + 5, ly)
+    } else if (obj.type === 'perp') {
+      const ref = geoObjects.value[obj.refIdx]
+      if (!ref || (ref.type !== 'line' && ref.type !== 'segment')) continue
+      const dx = ref.x2 - ref.x1, dy = ref.y2 - ref.y1
+      const len = Math.hypot(dx, dy)
+      if (len < 1e-12) continue
+      // 垂直方向: rotate 90度
+      const ux = -dy / len, uy = dx / len
+      const far = Math.max(cw, ch) / scale.value * 2
+      const [px1, py1] = mathToPx(obj.px - ux * far, obj.py - uy * far)
+      const [px2, py2] = mathToPx(obj.px + ux * far, obj.py + uy * far)
+      ctx.strokeStyle = '#f97316'; ctx.lineWidth = 1.5; ctx.setLineDash([6, 4])
+      ctx.beginPath(); ctx.moveTo(px1, py1); ctx.lineTo(px2, py2); ctx.stroke()
+      ctx.setLineDash([])
+      const [lx, ly] = mathToPx(obj.px, obj.py)
+      ctx.fillStyle = '#f97316'; ctx.beginPath(); ctx.arc(lx, ly, 3, 0, Math.PI * 2); ctx.fill()
+      ctx.fillStyle = 'rgba(255,255,255,0.8)'; ctx.fillText(obj.label, lx + 5, ly)
+    } else if (obj.type === 'intersection') {
+      const [px, py] = mathToPx(obj.x, obj.y)
+      ctx.fillStyle = '#f43f5e'
+      ctx.beginPath(); ctx.arc(px, py, 5, 0, Math.PI * 2); ctx.fill()
+      ctx.strokeStyle = 'rgba(255,255,255,0.6)'; ctx.lineWidth = 1.5; ctx.stroke()
+      ctx.fillStyle = 'rgba(255,255,255,0.9)'
+      ctx.fillText(obj.label, px + 8, py - 8)
+      ctx.fillStyle = 'rgba(255,255,255,0.5)'
+      ctx.fillText(`(${obj.x.toFixed(3)}, ${obj.y.toFixed(3)})`, px + 8, py + 6)
+    }
+  }
+
+  // 绘制构造中的临时点
+  if (tempP1 && constructTool.value !== 'point' && constructTool.value !== 'intersection') {
+    const [px, py] = mathToPx(tempP1[0], tempP1[1])
+    ctx.fillStyle = 'rgba(251,191,36,0.6)'
+    ctx.beginPath(); ctx.arc(px, py, 4, 0, Math.PI * 2); ctx.fill()
+    ctx.strokeStyle = 'rgba(255,255,255,0.3)'; ctx.lineWidth = 1; ctx.stroke()
+  }
+}
+
 function redraw() {
   if (!ctx) return
   ctx.clearRect(0, 0, cw, ch)
@@ -397,6 +796,8 @@ function redraw() {
   for (const f of funcs) {
     if (f.enabled) drawFunc(f)
   }
+  drawSketches()
+  drawGeoObjects()
 }
 
 function scheduleRedraw() {
