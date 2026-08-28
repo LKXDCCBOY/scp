@@ -93,7 +93,15 @@ export const messages = {
       coordLabel: 'x: {x}  y: {y}',
       viewLabel: '缩放: {scale}x | 中心: ({cx}, {cy})',
       fullscreen: '全屏',
-      exitFullscreen: '退出全屏'
+      exitFullscreen: '退出全屏',
+      modeFunction: '函数', modeDraw: '涂鸦', modeConstruct: '构造',
+      clear: '清除',
+      toolPoint: '点', toolLine: '直线', toolSegment: '线段',
+      toolParallel: '平行线', toolPerp: '垂线', toolIntersect: '交点',
+      hintPoint: '点击放置点',
+      hintLine1: '点击第一个点', hintLine2: '点击第二个点',
+      hintParallel1: '点击已有的线/线段', hintParallel2: '点击要经过的点',
+      hintIntersect1: '点击第一个函数', hintIntersect2: '点击第二个函数'
     },
     advanced: {
       title: '高级数学工具',
@@ -187,6 +195,116 @@ export const messages = {
     }
   },
 
+  'en-US': {
+    app: { title: 'SCP', subtitle: 'Scientific Calculator Plus' },
+    hint: {
+      title: 'Key Hints',
+      none: 'Hover over a key to see its function',
+      SHIFT: 'SHIFT modifier — activates orange secondary functions',
+      ALPHA: 'ALPHA modifier — activates red variable input',
+      MODE: 'Switch mode (COMP / CMPLX / STAT / BASE-N)',
+      AC: 'All Clear — clears expression and result',
+      DEL: 'Delete character before cursor (SHIFT: toggle insert/overwrite)',
+      '◀': 'Cursor left', '▶': 'Cursor right',
+      'x²': 'Square — x squared (SHIFT: cube root cbrt)',
+      '^': 'Power — x to the y (SHIFT: square root sqrt)',
+      log: 'Common log log₁₀(x) (SHIFT: 10^x)',
+      ln: 'Natural log ln(x) (SHIFT: e^x)',
+      '(-)': 'Negative sign (SHIFT: absolute value abs)',
+      HYP: 'Hyperbolic prefix (SHIFT: inverse hyperbolic)',
+      sin: 'Sine sin(x) (SHIFT: arcsin)',
+      cos: 'Cosine cos(x) (SHIFT: arccos)',
+      tan: 'Tangent tan(x) (SHIFT: arctan)',
+      STO: 'Store — save value to variable A-F/X/Y/M',
+      RCL: 'Recall — read stored variable',
+      ENG: 'Engineering notation (SHIFT: normal NORM)',
+      'x³': 'Cube — x cubed (SHIFT: reciprocal 1/x)',
+      pi: 'Pi = 3.14159265... (SHIFT: Euler\'s number e)',
+      DRG: 'Angle unit: Deg/Rad/Grad',
+      '7': 'Digit 7', '8': 'Digit 8', '9': 'Digit 9',
+      sinh: 'Hyperbolic sine sinh(x) (SHIFT: asinh)',
+      '(': 'Left paren (SHIFT: abs)', ')': 'Right paren (SHIFT: floor)',
+      '4': 'Digit 4', '5': 'Digit 5', '6': 'Digit 6',
+      cosh: 'Hyperbolic cosine cosh(x) (SHIFT: acosh)',
+      'M+': 'Add to memory M', 'M-': 'Subtract from memory M',
+      '1': 'Digit 1', '2': 'Digit 2', '3': 'Digit 3',
+      tanh: 'Hyperbolic tangent tanh(x) (SHIFT: atanh)',
+      '0': 'Digit 0', '.': 'Decimal point (SHIFT: random)',
+      '×': 'Multiply', '÷': 'Divide',
+      Ans: 'Last answer (SHIFT: pi)',
+      EXP: 'Scientific notation x10^ (SHIFT: e^x)',
+      '-': 'Subtract', '+': 'Add',
+      'x!': 'Factorial x!',
+      x: 'Variable x (function input)', y: 'Variable y (function output)',
+      '!': 'Factorial symbol', ',': 'Argument separator',
+      '%': 'Percent', '=': 'Equals — execute calculation',
+      SPC: 'Space (matrix/data separator)',
+      ';': 'Semicolon (matrix row separator)',
+      ':': 'Colon (Python block)', '<': 'Less than', '>': 'Greater than',
+      '↵': 'Newline (Python multiline)'
+    },
+    tabs: { calc: 'Calc', graph: 'Graph', eqn: 'Equations', mat: 'Matrices', vec: 'Vectors', stat: 'Stats', 'calc-mod': 'Calculus', python: 'Python' },
+    screen: {
+      placeholder: 'Enter expression then press =',
+      history: 'History', historyCount: 'items', clearHistory: 'Clear',
+      noHistory: 'No records', noHistoryHint: 'Results will appear here after pressing =',
+      modes: { COMP: 'COMP', CMPLX: 'CMPLX', STAT: 'STAT', 'BASE-N': 'BASE', 'EQN': 'EQN', 'MAT': 'MAT' },
+      angles: { Deg: 'D', Rad: 'R', Grad: 'G' }
+    },
+    theme: { hint: 'Click to cycle: System / Dark / Light', mode: { system: 'System', dark: 'Dark', light: 'Light' } },
+    graph: {
+      title: 'Function Plotter', resetView: 'Reset View', zoomIn: 'Zoom In', zoomOut: 'Zoom Out',
+      addFunc: '+ Add Function', placeholder: 'f(x) e.g. sin(x) or x^2-3',
+      coordLabel: 'x: {x}  y: {y}', viewLabel: 'Zoom: {scale}x | Center: ({cx}, {cy})',
+      fullscreen: 'Fullscreen', exitFullscreen: 'Exit Fullscreen',
+      modeFunction: 'Function', modeDraw: 'Draw', modeConstruct: 'Construct',
+      clear: 'Clear',
+      toolPoint: 'Point', toolLine: 'Line', toolSegment: 'Segment',
+      toolParallel: 'Parallel', toolPerp: 'Perpendicular', toolIntersect: 'Intersect',
+      hintPoint: 'Click to place a point',
+      hintLine1: 'Click first point', hintLine2: 'Click second point',
+      hintParallel1: 'Click near a line/segment', hintParallel2: 'Click point to pass through',
+      hintIntersect1: 'Click near first function', hintIntersect2: 'Click near second function'
+    },
+    advanced: {
+      title: 'Advanced Math Tools', empty: 'Select a feature and click Compute', go: '▶ Compute',
+      modules: { eqn: 'Equations', mat: 'Matrices', vec: 'Vectors', stat: 'Statistics', calc: 'Calculus' },
+      quad: { title: 'Quadratic ax²+bx+c=0', hint: 'including complex roots' },
+      cubic: { title: 'Cubic ax³+bx²+cx+d=0', hint: 'Cardano formula' },
+      nl: { title: 'Any univariate f(x)=0', hint: 'Bisection + Newton' },
+      linear: { title: 'Linear system A·x=b (n×n)', hint: 'Gaussian elimination (partial pivot)' },
+      mat: { inputs: 'Input A and B', output: 'Result' },
+      vec: { inputs: 'Input vectors a and b', output: 'Result' },
+      stat: { data: 'Data Input', yHint: '(optional, for regression/Cov)', summaryX: 'X Summary Statistics', linreg: 'Linear Regression y=a+bx', result: 'Statistics Result' },
+      df: { title: 'Numerical Differentiation (central diff)', hint: '1st / 2nd order, 4th-order accuracy' },
+      int: { title: 'Adaptive Numerical Integration', hint: 'Simpson 1/3 adaptive' }
+    },
+    python: {
+      title: 'Python Console', notLoaded: 'Not loaded', loading: 'Loading... (~10MB)', ready: 'Ready',
+      load: 'Load Python', reload: 'Reload', clear: 'Clear', editor: 'Editor', example: 'Example...',
+      run: 'Run', running: 'Running...', placeholder: 'Enter Python code... (Ctrl+Enter to run)',
+      output: 'Output', outputCleared: 'Output cleared',
+      loadPrompt: 'Loading Pyodide (WebAssembly Python)... ~10MB',
+      loadSuccess: 'Python environment loaded! Ready to run code',
+      loadFail: 'Load failed: {msg}', noOutput: '(no output)', returnValue: '[Return] {val}',
+      mode: { math: 'Math Script', native: 'Native Python', pyodide: 'Pyodide' },
+      script: {
+        ready: 'Math Script mode ready',
+        hint: 'Supports assignment/print/for range/if/def, runs instantly with zero load',
+        placeholder: '# Math Script (zero load, instant run)\n# Supports assignment, print, for x in range(a,b), if, def\n# All scientific functions: sin, cos, tan, log, ln, sqrt, abs, floor\n# Press Ctrl+Enter to execute'
+      },
+      native: {
+        ok: 'Native Python available', checking: 'Detecting native Python...', none: 'No native Python found',
+        placeholder: '# Use the locally installed Python interpreter\n# Supports standard library and third-party packages\n# Press Ctrl+Enter to run',
+        ready: 'Connected to native Python', running: 'Calling native Python interpreter...',
+        tip: 'Please install Python 3 (python.org/downloads), check "Add to PATH", then restart the calculator'
+      },
+      pyodide: { tip: 'Click "Load Python" to enable Pyodide (WebAssembly, ~10MB)' },
+      examples: { basic: 'Basic Operations', func: 'Define Function', loop: 'Loops & Lists', math: 'Math Calculations', matrix: 'Matrix Operations' }
+    },
+    code: { default: '', basic: '', func: '', loop: '', math: '', matrix: '' }
+  },
+
   'zh-TW': {
     app: { title: 'SCP', subtitle: 'Scientific Calculator Plus' },
     hint: {
@@ -252,7 +370,15 @@ export const messages = {
       title: '函數繪圖', resetView: '重設視圖', zoomIn: '放大', zoomOut: '縮小',
       addFunc: '+ 新增函數', placeholder: 'f(x) 如 sin(x) 或 x^2-3',
       coordLabel: 'x: {x}  y: {y}', viewLabel: '縮放: {scale}x | 中心: ({cx}, {cy})',
-      fullscreen: '全螢幕', exitFullscreen: '退出全螢幕'
+      fullscreen: '全螢幕', exitFullscreen: '退出全螢幕',
+      modeFunction: '函數', modeDraw: '塗鴉', modeConstruct: '構造',
+      clear: '清除',
+      toolPoint: '點', toolLine: '直線', toolSegment: '線段',
+      toolParallel: '平行線', toolPerp: '垂線', toolIntersect: '交點',
+      hintPoint: '點擊放置點',
+      hintLine1: '點擊第一個點', hintLine2: '點擊第二個點',
+      hintParallel1: '點擊已有的線/線段', hintParallel2: '點擊要經過的點',
+      hintIntersect1: '點擊第一個函數', hintIntersect2: '點擊第二個函數'
     },
     advanced: {
       title: '進階數學工具', empty: '請選擇功能並點擊運算按鈕', go: '▶ 運算',
@@ -367,7 +493,15 @@ export const messages = {
       title: '関数プロッター', resetView: 'ビューリセット', zoomIn: '拡大', zoomOut: '縮小',
       addFunc: '+ 関数追加', placeholder: 'f(x) 例 sin(x) または x^2-3',
       coordLabel: 'x: {x}  y: {y}', viewLabel: '倍率: {scale}x | 中心: ({cx}, {cy})',
-      fullscreen: 'フルスクリーン', exitFullscreen: 'フルスクリーン終了'
+      fullscreen: 'フルスクリーン', exitFullscreen: 'フルスクリーン終了',
+      modeFunction: '関数', modeDraw: '手描き', modeConstruct: '作図',
+      clear: 'クリア',
+      toolPoint: '点', toolLine: '直線', toolSegment: '線分',
+      toolParallel: '平行線', toolPerp: '垂線', toolIntersect: '交点',
+      hintPoint: 'クリックして点を配置',
+      hintLine1: '最初の点をクリック', hintLine2: '2番目の点をクリック',
+      hintParallel1: '線/線分の近くをクリック', hintParallel2: '通過点をクリック',
+      hintIntersect1: '最初の関数をクリック', hintIntersect2: '2番目の関数をクリック'
     },
     advanced: {
       title: '高度な数学ツール', empty: '機能を選んで「計算」をクリック', go: '▶ 計算',
@@ -483,7 +617,15 @@ export const messages = {
       title: 'Построитель графиков', resetView: 'Сброс вида', zoomIn: 'Приблизить', zoomOut: 'Отдалить',
       addFunc: '+ Добавить функцию', placeholder: 'f(x), напр. sin(x) или x^2-3',
       coordLabel: 'x: {x}  y: {y}', viewLabel: 'Масштаб: {scale}x | Центр: ({cx}, {cy})',
-      fullscreen: 'На весь экран', exitFullscreen: 'Выйти из полноэкранного режима'
+      fullscreen: 'На весь экран', exitFullscreen: 'Выйти из полноэкранного режима',
+      modeFunction: 'Функция', modeDraw: 'Рисование', modeConstruct: 'Построение',
+      clear: 'Очистить',
+      toolPoint: 'Точка', toolLine: 'Прямая', toolSegment: 'Отрезок',
+      toolParallel: 'Параллель', toolPerp: 'Перпендикуляр', toolIntersect: 'Пересечение',
+      hintPoint: 'Кликните, чтобы поставить точку',
+      hintLine1: 'Кликните первую точку', hintLine2: 'Кликните вторую точку',
+      hintParallel1: 'Кликните рядом с прямой/отрезком', hintParallel2: 'Кликните точку для проведения',
+      hintIntersect1: 'Кликните первую функцию', hintIntersect2: 'Кликните вторую функцию'
     },
     advanced: {
       title: 'Продвинутые математические инструменты',
@@ -600,7 +742,15 @@ export const messages = {
       title: 'Traceur de courbes', resetView: 'Réinitialiser la vue', zoomIn: 'Zoomer', zoomOut: 'Dézoomer',
       addFunc: '+ Ajouter une fonction', placeholder: 'f(x) ex: sin(x) ou x^2-3',
       coordLabel: 'x: {x}  y: {y}', viewLabel: 'Zoom: {scale}x | Centre: ({cx}, {cy})',
-      fullscreen: 'Plein écran', exitFullscreen: 'Quitter le plein écran'
+      fullscreen: 'Plein écran', exitFullscreen: 'Quitter le plein écran',
+      modeFunction: 'Fonction', modeDraw: 'Dessin', modeConstruct: 'Construction',
+      clear: 'Effacer',
+      toolPoint: 'Point', toolLine: 'Droite', toolSegment: 'Segment',
+      toolParallel: 'Parallèle', toolPerp: 'Perpendiculaire', toolIntersect: 'Intersection',
+      hintPoint: 'Cliquez pour placer un point',
+      hintLine1: 'Cliquez le premier point', hintLine2: 'Cliquez le second point',
+      hintParallel1: 'Cliquez près d\'une droite/segment', hintParallel2: 'Cliquez le point de passage',
+      hintIntersect1: 'Cliquez la première fonction', hintIntersect2: 'Cliquez la seconde fonction'
     },
     advanced: {
       title: 'Outils mathématiques avancés',
@@ -717,7 +867,15 @@ export const messages = {
       title: 'Funktionsplotter', resetView: 'Ansicht zurücksetzen', zoomIn: 'Vergrößern', zoomOut: 'Verkleinern',
       addFunc: '+ Funktion hinzufügen', placeholder: 'f(x) z. B. sin(x) oder x^2-3',
       coordLabel: 'x: {x}  y: {y}', viewLabel: 'Zoom: {scale}x | Zentrum: ({cx}, {cy})',
-      fullscreen: 'Vollbild', exitFullscreen: 'Vollbild verlassen'
+      fullscreen: 'Vollbild', exitFullscreen: 'Vollbild verlassen',
+      modeFunction: 'Funktion', modeDraw: 'Zeichnen', modeConstruct: 'Konstruktion',
+      clear: 'Löschen',
+      toolPoint: 'Punkt', toolLine: 'Gerade', toolSegment: 'Strecke',
+      toolParallel: 'Parallele', toolPerp: 'Senkrechte', toolIntersect: 'Schnittpunkt',
+      hintPoint: 'Klicken, um Punkt zu setzen',
+      hintLine1: 'Ersten Punkt klicken', hintLine2: 'Zweiten Punkt klicken',
+      hintParallel1: 'Nahe einer Geraden/Strecke klicken', hintParallel2: 'Durchgangspunkt klicken',
+      hintIntersect1: 'Erste Funktion klicken', hintIntersect2: 'Zweite Funktion klicken'
     },
     advanced: {
       title: 'Erweiterte Mathematik-Tools',

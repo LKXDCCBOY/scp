@@ -80,19 +80,19 @@
                     :style="toolMode === 'function'
                       ? { background: 'var(--primary-bg)', borderColor: 'var(--primary-text)', color: 'var(--primary-text)' }
                       : { background: 'var(--chip-bg)', borderColor: 'var(--chip-border)', color: 'var(--text-muted)' }"
-                    style="border-width:1px">Function</button>
+                    style="border-width:1px">{{ t('graph.modeFunction') }}</button>
             <button @click="toolMode = 'draw'; scheduleRedraw()"
                     class="text-[10px] px-2.5 py-1 rounded-lg border transition"
                     :style="toolMode === 'draw'
                       ? { background: 'var(--primary-bg)', borderColor: 'var(--primary-text)', color: 'var(--primary-text)' }
                       : { background: 'var(--chip-bg)', borderColor: 'var(--chip-border)', color: 'var(--text-muted)' }"
-                    style="border-width:1px">Draw</button>
+                    style="border-width:1px">{{ t('graph.modeDraw') }}</button>
             <button @click="toolMode = 'construct'; constructStep = 0; tempP1 = null; selectedRefIdx = -1; scheduleRedraw()"
                     class="text-[10px] px-2.5 py-1 rounded-lg border transition"
                     :style="toolMode === 'construct'
                       ? { background: 'var(--primary-bg)', borderColor: 'var(--primary-text)', color: 'var(--primary-text)' }
                       : { background: 'var(--chip-bg)', borderColor: 'var(--chip-border)', color: 'var(--text-muted)' }"
-                    style="border-width:1px">Construct</button>
+                    style="border-width:1px">{{ t('graph.modeConstruct') }}</button>
 
             <!-- 涂鸦控件 -->
             <template v-if="toolMode === 'draw'">
@@ -108,25 +108,25 @@
               <button @click="sketches = []; scheduleRedraw()"
                       class="text-[10px] px-2 py-1 rounded-lg border transition"
                       :style="{ background: 'var(--chip-bg)', borderColor: 'var(--chip-border)', color: 'var(--text-muted)' }"
-                      style="border-width:1px">Clear</button>
+                      style="border-width:1px">{{ t('graph.clear') }}</button>
             </template>
 
             <!-- 构造工具栏 -->
             <template v-if="toolMode === 'construct'">
               <div class="flex items-center gap-1 ml-2 flex-wrap">
-                <button v-for="t in constructTools" :key="t.id"
-                        @click="constructTool = t.id; constructStep = 0; tempP1 = null; selectedRefIdx = -1"
+                <button v-for="ct in constructTools" :key="ct.id"
+                        @click="constructTool = ct.id; constructStep = 0; tempP1 = null; selectedRefIdx = -1"
                         class="text-[10px] px-2 py-1 rounded-lg border transition"
-                        :style="constructTool === t.id
+                        :style="constructTool === ct.id
                           ? { background: 'var(--primary-bg)', borderColor: 'var(--primary-text)', color: 'var(--primary-text)' }
                           : { background: 'var(--chip-bg)', borderColor: 'var(--chip-border)', color: 'var(--text-muted)' }"
-                        style="border-width:1px">{{ t.label }}</button>
+                        style="border-width:1px">{{ t('graph.' + ct.key) }}</button>
               </div>
               <span class="text-[10px]" :style="{ color: 'var(--text-muted)' }">{{ constructHint }}</span>
               <button @click="geoObjects = []; geoLabelIdx = 1; scheduleRedraw()"
                       class="text-[10px] px-2 py-1 rounded-lg border transition"
                       :style="{ background: 'var(--chip-bg)', borderColor: 'var(--chip-border)', color: 'var(--text-muted)' }"
-                      style="border-width:1px">Clear</button>
+                      style="border-width:1px">{{ t('graph.clear') }}</button>
             </template>
           </div>
         </div>
@@ -246,28 +246,29 @@ let selectedRefIdx = -1
 const drawColors = ['#4f8cff', '#f43f5e', '#10b981', '#f59e0b', '#a855f7', '#06b6d4', '#ec4899', '#ffffff']
 
 // 构造工具列表
-const constructTools: { id: ConstructTool; label: string }[] = [
-  { id: 'point', label: 'Point' },
-  { id: 'line', label: 'Line' },
-  { id: 'segment', label: 'Segment' },
-  { id: 'parallel', label: 'Parallel' },
-  { id: 'perp', label: 'Perpendicular' },
-  { id: 'intersection', label: 'Intersect' }
+const constructTools: { id: ConstructTool; key: string }[] = [
+  { id: 'point', key: 'toolPoint' },
+  { id: 'line', key: 'toolLine' },
+  { id: 'segment', key: 'toolSegment' },
+  { id: 'parallel', key: 'toolParallel' },
+  { id: 'perp', key: 'toolPerp' },
+  { id: 'intersection', key: 'toolIntersect' }
 ]
 
 const constructHint = computed(() => {
-  if (constructTool.value === 'point') return 'Click to place a point'
-  if (constructTool.value === 'line' || constructTool.value === 'segment') {
-    return constructStep === 0 ? 'Click first point' : 'Click second point'
+  const tool = constructTool.value
+  if (tool === 'point') return t('graph.hintPoint')
+  if (tool === 'line' || tool === 'segment') {
+    return constructStep === 0 ? t('graph.hintLine1') : t('graph.hintLine2')
   }
-  if (constructTool.value === 'parallel') {
-    return constructStep === 0 ? 'Click near a line/segment' : 'Click point to pass through'
+  if (tool === 'parallel') {
+    return constructStep === 0 ? t('graph.hintParallel1') : t('graph.hintParallel2')
   }
-  if (constructTool.value === 'perp') {
-    return constructStep === 0 ? 'Click near a line/segment' : 'Click point to pass through'
+  if (tool === 'perp') {
+    return constructStep === 0 ? t('graph.hintParallel1') : t('graph.hintParallel2')
   }
-  if (constructTool.value === 'intersection') {
-    return constructStep === 0 ? 'Click near first function' : 'Click near second function'
+  if (tool === 'intersection') {
+    return constructStep === 0 ? t('graph.hintIntersect1') : t('graph.hintIntersect2')
   }
   return ''
 })
