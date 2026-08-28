@@ -23,6 +23,17 @@ export function runScript(code: string, ctx: Partial<ScriptContext> = {}): Scrip
   const vars: Record<string, number | string> = { ...(ctx.vars ?? {}) }
   const angleMode: AngleMode = (ctx.angleMode ?? 'Deg')
 
+  // 安全限制
+  const MAX_OUTPUT_LINES = 10000
+  const MAX_STATEMENTS = 500000
+  let stmtCount = 0
+
+  function checkLimit() {
+    stmtCount++
+    if (stmtCount > MAX_STATEMENTS) throw new Error('Too many statements executed (>' + MAX_STATEMENTS / 1000 + 'k), possible infinite loop')
+    if (output.length > MAX_OUTPUT_LINES) throw new Error('Output too many lines (>' + MAX_OUTPUT_LINES / 1000 + 'k), output truncated')
+  }
+
   try {
     const lines = code.split(/\r?\n/)
     let i = 0
@@ -30,6 +41,8 @@ export function runScript(code: string, ctx: Partial<ScriptContext> = {}): Scrip
       const raw = lines[i]
       const line = stripComment(raw).trimEnd()
       if (!line.trim()) { i++; continue }
+
+      checkLimit()
 
       // 处理多行块: for / if / def
       const blockMatch = line.match(/^(for|if|def)\s+(.+):\s*$/)
@@ -51,10 +64,9 @@ export function runScript(code: string, ctx: Partial<ScriptContext> = {}): Scrip
           i++
         }
         if (blockType === 'for') {
-          execFor(blockHead, blockLines, { vars, angleMode }, output)
+          execFor(blockHead, blockLines, { vars, angleMode }, output, checkLimit)
         } else if (blockType === 'if') {
-          execIf(blockHead, blockLines, lines.slice(i), { vars, angleMode }, output)
-          // execIf 已返回消耗行，重新定位（当前只支持单块无else，不消耗外部行）
+          execIf(blockHead, blockLines, lines.slice(i), { vars, angleMode }, output, checkLimit)
         } else if (blockType === 'def') {
           execDef(blockHead, blockLines, vars)
         }
@@ -262,7 +274,7 @@ function formatValue(v: number | string): string {
   return parseFloat(v.toPrecision(12)).toString()
 }
 
-function execFor(head: string, body: string[], ctx: ScriptContext, output: string[]) {
+function execFor(head: string, body: string[], ctx: ScriptContext, output: string[], checkLimit?: () => void) {
   const m = head.match(/^([A-Za-z_][A-Za-z0-9_]*)\s+in\s+range\s*\((.+)\)$/)
   if (!m) throw new Error(`SyntaxError: invalid for loop 'for ${head}:'`)
   const varName = m[1]
@@ -277,6 +289,7 @@ function execFor(head: string, body: string[], ctx: ScriptContext, output: strin
   if (step > 0) {
     for (let v = start; v < stop; v += step) {
       if (count++ > safe) throw new Error('Loop too many iterations (>100k)')
+      if (checkLimit) checkLimit()
       ctx.vars[varName] = v
       for (const bl of body) {
         execStatement(stripComment(bl).trimEnd(), ctx, output)
@@ -285,6 +298,7 @@ function execFor(head: string, body: string[], ctx: ScriptContext, output: strin
   } else {
     for (let v = start; v > stop; v += step) {
       if (count++ > safe) throw new Error('Loop too many iterations (>100k)')
+      if (checkLimit) checkLimit()
       ctx.vars[varName] = v
       for (const bl of body) {
         execStatement(stripComment(bl).trimEnd(), ctx, output)
@@ -293,10 +307,11 @@ function execFor(head: string, body: string[], ctx: ScriptContext, output: strin
   }
 }
 
-function execIf(head: string, body: string[], _rest: string[], ctx: ScriptContext, output: string[]) {
+function execIf(head: string, body: string[], _rest: string[], ctx: ScriptContext, output: string[], checkLimit?: () => void) {
   const cond = evalCondition(head, ctx)
   if (cond) {
     for (const bl of body) {
+      if (checkLimit) checkLimit()
       execStatement(stripComment(bl).trimEnd(), ctx, output)
     }
   }

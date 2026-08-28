@@ -133,89 +133,10 @@ const canRun = computed(() => {
   return pyoReady.value
 })
 
-// 切换语言时更新代码内容
+// 切换语言时不自动填充代码（输入框保持空）
 watch(lang, () => {
-  if (example.value) loadExample()
-  else code.value = (msgs.value.code as any)[defaultCodeByMode(mode.value)] || ''
+  // 仅更新输出提示文本，不填充代码
 }, { flush: 'post' })
-
-function defaultCodeByMode(m: ModeId): string {
-  if (m === 'math') return 'mathScript'
-  return 'default'
-}
-
-// ---- 数学脚本模式 默认脚本 ----
-const MATH_SCRIPT_ZH = `# 数学脚本：直接运行，零加载
-# 支持变量、print、for in range、if、def、比较运算
-# 所有科学函数 (sin, cos, tan, log, ln, sqrt, abs, floor, ...) 均可用
-
-x = sin(30) + ln(e^2)
-print("x =", x)
-
-# 循环求平方和
-s = 0
-for i in range(1, 6):
-    s = s + i^2
-    print("i =", i, "  i^2 =", i^2)
-
-print("平方和 s =", s)
-
-# 解一元二次方程
-def solve(a, b, c):
-    d = b^2 - 4*a*c
-    if d < 0:
-        print("无实根")
-    else:
-        r = sqrt(d)
-        x1 = (-b + r) / (2*a)
-        x2 = (-b - r) / (2*a)
-        print("x1 =", x1)
-        print("x2 =", x2)
-
-solve(1, -5, 6)
-`
-
-const MATH_SCRIPT_EN = `# Math Script: zero-load instant execution
-# Supports assignment, print, for..in range, if, def, comparisons
-# All scientific functions (sin, cos, tan, log, ln, sqrt, abs, floor, ...) available
-
-x = sin(30) + ln(e^2)
-print("x =", x)
-
-# Sum of squares with a loop
-s = 0
-for i in range(1, 6):
-    s = s + i^2
-    print("i =", i, "  i^2 =", i^2)
-
-print("Sum of squares s =", s)
-
-# Quadratic solver
-def solve(a, b, c):
-    d = b^2 - 4*a*c
-    if d < 0:
-        print("No real roots")
-    else:
-        r = sqrt(d)
-        x1 = (-b + r) / (2*a)
-        x2 = (-b - r) / (2*a)
-        print("x1 =", x1)
-        print("x2 =", x2)
-
-solve(1, -5, 6)
-`
-
-// 初始化默认代码
-function initDefaultCode() {
-  if (lang.value === 'en-US') {
-    if (mode.value === 'math') code.value = MATH_SCRIPT_EN
-    else code.value = msgs.value.code.default
-  } else {
-    if (mode.value === 'math') code.value = MATH_SCRIPT_ZH
-    else code.value = msgs.value.code.default
-  }
-}
-initDefaultCode()
 
 function loadExample() {
   if (!example.value) return
@@ -246,13 +167,43 @@ const cs = {
 }
 
 function pushResult(html: string) {
-  outputHtml.value = html
+  outputHtml.value = truncateOutput(html)
   nextTick().then(() => { if (outputEl.value) outputEl.value.scrollTop = outputEl.value.scrollHeight })
+}
+
+// ---- 防爆内存：危险代码预扫描 ----
+const MAX_OUTPUT_CHARS = 200_000 // 输出截断阈值
+
+function scanDangerousCode(src: string): string | null {
+  // 检测 ** 后跟超大指数（如 2**10000000）
+  const powMatch = src.match(/\*\*\s*(\d{5,})/)
+  if (powMatch) return `Exponent too large (${powMatch[1]}), may exhaust memory`
+  // 检测 range 超大循环（如 range(100000000)）
+  const rangeMatch = src.match(/range\s*\(\s*(\d{8,})/)
+  if (rangeMatch) return `Range too large (${rangeMatch[1]}), may hang or exhaust memory`
+  // 检测字符串 * 超大倍数（如 "x" * 100000000）
+  const strMulMatch = src.match(/["'].*?["']\s*\*\s*(\d{8,})/)
+  if (strMulMatch) return `String repetition too large (${strMulMatch[1]}), may exhaust memory`
+  // 检测列表 * 超大倍数
+  const listMulMatch = src.match(/\[.*?\]\s*\*\s*(\d{8,})/)
+  if (listMulMatch) return `List repetition too large (${listMulMatch[1]}), may exhaust memory`
+  return null
+}
+
+function truncateOutput(html: string): string {
+  if (html.length <= MAX_OUTPUT_CHARS) return html
+  return html.slice(0, MAX_OUTPUT_CHARS) + '\n<span ' + cs.dim + '>... output truncated (' + Math.round(MAX_OUTPUT_CHARS / 1000) + 'KB limit)</span>'
 }
 
 // ---- 运行调度 ----
 async function runCode() {
   if (!canRun.value || running.value) return
+  // 预扫描危险代码
+  const danger = scanDangerousCode(code.value)
+  if (danger) {
+    pushResult(`<span ${cs.err}>⚠ ${escapeHtml(danger)}</span>`)
+    return
+  }
   running.value = true
   try {
     if (mode.value === 'math')   return await runMathScript()
@@ -372,10 +323,27 @@ async function runPyodide() {
     if (!pyoReady.value) return
   }
   const lines: string[] = []
-  pyodide.setStdout({ batched: (s: string) => lines.push(`<span ${cs.stdout}>${escapeHtml(s)}</span>`) })
-  pyodide.setStderr({ batched: (s: string) => lines.push(`<span ${cs.err}>${escapeHtml(s)}</span>`) })
+  let outputChars = 0
+  pyodide.setStdout({ batched: (s: string) => {
+    outputChars += s.length
+    if (outputChars > MAX_OUTPUT_CHARS) return // 超阈值丢弃
+    lines.push(`<span ${cs.stdout}>${escapeHtml(s)}</span>`)
+  } })
+  pyodide.setStderr({ batched: (s: string) => {
+    outputChars += s.length
+    if (outputChars > MAX_OUTPUT_CHARS) return
+    lines.push(`<span ${cs.err}>${escapeHtml(s)}</span>`)
+  } })
   try {
-    const result = await pyodide.runPythonAsync(code.value)
+    // 15 秒超时保护
+    const timeoutMs = 15000
+    const timeoutPromise = new Promise((_, reject) =>
+      setTimeout(() => reject(new Error('Execution timed out (>' + timeoutMs / 1000 + 's)')), timeoutMs)
+    )
+    const result = await Promise.race([
+      pyodide.runPythonAsync(code.value),
+      timeoutPromise
+    ])
     if (result !== undefined && result !== null) {
       lines.push(`<span ${cs.ret}>${t('python.returnValue', { val: escapeHtml(String(result)) })}</span>`)
     }
@@ -386,6 +354,9 @@ async function runPyodide() {
     lines.push(`<span ${cs.err}>${escapeHtml(lastLine)}</span>`)
   } finally {
     if (lines.length === 0) lines.push(`<span ${cs.muted}>` + t('python.noOutput') + '</span>')
+    if (outputChars > MAX_OUTPUT_CHARS) {
+      lines.push(`<span ${cs.dim}>... output truncated (${Math.round(MAX_OUTPUT_CHARS / 1000)}KB limit)</span>`)
+    }
     pushResult(lines.join('\n'))
   }
 }
@@ -398,7 +369,7 @@ async function switchMode(m: ModeId) {
     if (window.calcNative?.isElectron) checkNative()
     else { nativeStatus.value = 'none' }
   }
-  initDefaultCode()
+  // 输入框保持空，不预填代码
   if (m === 'math') {
     pushResult(`<span ${cs.ret}>` + t('python.script.ready') + ' · ' + t('python.script.hint') + '</span>')
   } else if (m === 'native') {

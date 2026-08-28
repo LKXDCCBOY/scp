@@ -469,6 +469,8 @@ function applyBin(op: string, a: number, b: number): number {
       if (b === 0) throw new CalcError('DIV BY ZERO')
       return a / b
     case '^':
+      // 防爆内存：指数过大时提前拦截
+      if (Math.abs(b) > 300 && Math.abs(a) > 1) throw new CalcError('OVERFLOW (exponent too large)')
       const r = Math.pow(a, b)
       if (!isFinite(r) && isFinite(a) && isFinite(b)) throw new CalcError('MATH ERROR')
       return r

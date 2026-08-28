@@ -32,8 +32,14 @@ function runPythonCode(code) {
         return tryNext(list, idx + 1)
       }
       child.on('error', () => { errored = true; tryNext(list, idx + 1) })
-      child.stdout.on('data', d => { stdout += d.toString() })
-      child.stderr.on('data', d => { stderr += d.toString() })
+      child.stdout.on('data', d => {
+        const chunk = d.toString()
+        if (stdout.length < 5_000_000) stdout += chunk // 5MB 上限防爆内存
+      })
+      child.stderr.on('data', d => {
+        const chunk = d.toString()
+        if (stderr.length < 5_000_000) stderr += chunk
+      })
       child.on('close', (code) => {
         if (errored) return
         if (code === 0 || (code === null && !stderr)) {
