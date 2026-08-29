@@ -1,7 +1,7 @@
 <template>
   <div class="glass-panel p-2 sm:p-2.5 w-full h-full flex flex-col">
     <div class="grid gap-1 sm:gap-1.5 grid-cols-6 flex-1"
-         style="grid-template-rows: repeat(10, minmax(0, 1fr));">
+         style="grid-template-rows: repeat(11, minmax(0, 1fr));">
       <CalcKey
         v-for="(k, idx) in layout" :key="k.id + idx"
         :item="k"
@@ -78,20 +78,27 @@ const layout = computed<KeyDef[]>(() => [
   OP('-', { size: 1, label: '−' }),
   OP('+', { size: 1, label: '+' }),
   SPECIAL('x!',  { label: 'x!' }),
-  // row 9 — 变量与符号
-  FUNC('x', { label: 'x', cls: 'key-special', size: 1 }),
-  FUNC('y', { label: 'y', cls: 'key-special', size: 1 }),
-  FUNC('=', { cls: 'key-eq', size: 1, label: '=' }),
-  SPECIAL('!', { label: '!', cls: 'key-op' }),
-  SPECIAL('%', { label: '%', cls: 'key-op' }),
-  FUNC(',',  { label: ',', size: 0 }),
-  // row 10 — 文本/Python 符号
-  FUNC('SPC', { label: 'SPC', cls: 'key-func', size: 2 }),
-  FUNC(';',  { label: ';', size: 0 }),
-  FUNC(':',  { label: ':', size: 0 }),
-  FUNC('<',  { label: '<', size: 0 }),
-  FUNC('>',  { label: '>', size: 0 }),
-  FUNC('↵',  { label: '↵', cls: 'key-special', size: 0 })
+  // row 9 — 变量 a/b/c/m/n/t  (6 cols)
+  FUNC('a', { label: 'a', cls: 'key-special', size: 0, alphaLabel: 'A' }),
+  FUNC('b', { label: 'b', cls: 'key-special', size: 0, alphaLabel: 'B' }),
+  FUNC('c', { label: 'c', cls: 'key-special', size: 0, alphaLabel: 'C' }),
+  FUNC('m', { label: 'm', cls: 'key-special', size: 0 }),
+  FUNC('n', { label: 'n', cls: 'key-special', size: 0 }),
+  FUNC('t', { label: 't', cls: 'key-special', size: 0 }),
+  // row 10 — 变量 x/y/z/k/d + 分隔逗号 (6 cols)
+  FUNC('x', { label: 'x', cls: 'key-special', size: 0 }),
+  FUNC('y', { label: 'y', cls: 'key-special', size: 0 }),
+  FUNC('z', { label: 'z', cls: 'key-special', size: 0 }),
+  FUNC('k', { label: 'k', cls: 'key-special', size: 0 }),
+  FUNC('d', { label: 'd', cls: 'key-special', size: 0 }),
+  FUNC(',', { label: ',', cls: 'key-op', size: 0 }),
+  // row 11 — 符号/Python专用 + = (6 cols)
+  FUNC('!',   { label: '!', cls: 'key-op', size: 0 }),
+  SPECIAL('%', { label: '%', cls: 'key-op', size: 0 }),
+  FUNC('SPC', { label: 'SPC', cls: 'key-func', size: 1 }),
+  FUNC(';',   { label: ';', size: 0 }),
+  FUNC(':',   { label: ':', size: 0 }),
+  FUNC('↵',   { label: '↵', cls: 'key-special', size: 0 })
 ])
 
 function handlePress(k: KeyDef, _emitted: string) {

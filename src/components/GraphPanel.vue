@@ -51,26 +51,123 @@
 
           <!-- 函数输入列表 -->
           <div class="flex-none space-y-1.5 overflow-y-auto scrollbar-thin"
-               :class="isFullscreen ? 'max-h-[240px]' : 'max-h-[120px]'">
-            <div v-for="(f, i) in funcs" :key="i" class="flex items-center gap-1.5">
-              <span class="w-4 h-4 rounded-full flex-none border border-white/20" :style="{ background: f.color }"></span>
-              <span class="text-[11px] flex-none w-10" :style="{ color: 'var(--text-muted)' }">y =</span>
-              <input
-                v-model="f.expr"
-                @keyup.enter="redraw"
-                @blur="redraw"
-                @focus="router.onFocus"
-                @keydown.capture="router.onKeydownCapture"
-                :readonly="router.readonly"
-                class="flex-1 rounded-lg px-2 py-1 text-xs sm:text-sm
-                       font-mono focus:outline-none w-0 min-w-0"
-                :style="{ background: 'var(--input-bg)', borderColor: 'var(--input-border)', color: 'var(--input-text)' }"
-                style="border-width:1px"
-                :placeholder="t('graph.placeholder')"
-              />
-              <button @click="removeFunc(i)" class="text-[11px] text-rose-400/70 hover:text-rose-400 px-1 flex-none">x</button>
+               :class="isFullscreen ? 'max-h-[240px]' : 'max-h-[140px]'">
+            <template v-for="(f, i) in funcs" :key="i">
+              <!-- y = f(x) 模式 -->
+              <div v-if="f.kind === 'yx'" class="flex items-center gap-1.5">
+                <span class="w-4 h-4 rounded-full flex-none border border-white/20" :style="{ background: f.color }"></span>
+                <button @click="toggleFuncKind(i)"
+                        class="text-[9px] flex-none w-14 rounded-md py-0.5 font-medium transition hover:opacity-80"
+                        :style="{ background: 'var(--chip-bg)', color: 'var(--text-muted)' }"
+                        title="切换为参数方程">y=f(x) ▼</button>
+                <input
+                  v-model="f.expr"
+                  @keyup.enter="redraw"
+                  @blur="redraw"
+                  @focus="router.onFocus"
+                  @keydown.capture="router.onKeydownCapture"
+                  :readonly="router.readonly"
+                  class="flex-1 rounded-lg px-2 py-1 text-xs sm:text-sm
+                         font-mono focus:outline-none w-0 min-w-0"
+                  :style="{ background: 'var(--input-bg)', borderColor: 'var(--input-border)', color: 'var(--input-text)' }"
+                  style="border-width:1px"
+                  :placeholder="t('graph.placeholder')"
+                />
+                <label class="flex-none flex items-center gap-0.5 cursor-pointer">
+                  <input type="checkbox" v-model="f.enabled" @change="redraw" class="accent-indigo-500 w-3 h-3" />
+                </label>
+                <button @click="removeFunc(i)" class="text-[11px] text-rose-400/70 hover:text-rose-400 px-1 flex-none">x</button>
+              </div>
+              <!-- 参数方程 x(t), y(t) 模式 -->
+              <div v-else class="space-y-1">
+                <div class="flex items-center gap-1.5">
+                  <span class="w-4 h-4 rounded-full flex-none border border-white/20" :style="{ background: f.color }"></span>
+                  <button @click="toggleFuncKind(i)"
+                          class="text-[9px] flex-none w-14 rounded-md py-0.5 font-medium transition hover:opacity-80"
+                          :style="{ background: 'var(--primary-bg)', color: 'var(--primary-text)' }"
+                          title="切换为 y=f(x)">x(t),y(t) ▼</button>
+                  <span class="text-[10px] w-12 flex-none text-right" :style="{ color: 'var(--text-muted)' }">x(t)=</span>
+                  <input
+                    v-model="f.paramX"
+                    @keyup.enter="redraw"
+                    @blur="redraw"
+                    @focus="router.onFocus"
+                    @keydown.capture="router.onKeydownCapture"
+                    :readonly="router.readonly"
+                    class="flex-1 rounded-lg px-2 py-1 text-[11px] sm:text-xs
+                           font-mono focus:outline-none w-0 min-w-0"
+                    :style="{ background: 'var(--input-bg)', borderColor: 'var(--input-border)', color: 'var(--input-text)' }"
+                    style="border-width:1px"
+                    placeholder="cos(t) + a*cos(3t)"
+                  />
+                  <label class="flex-none flex items-center gap-0.5 cursor-pointer">
+                    <input type="checkbox" v-model="f.enabled" @change="redraw" class="accent-indigo-500 w-3 h-3" />
+                  </label>
+                  <button @click="removeFunc(i)" class="text-[11px] text-rose-400/70 hover:text-rose-400 px-1 flex-none">x</button>
+                </div>
+                <div class="flex items-center gap-1.5 pl-8">
+                  <span class="text-[10px] w-12 flex-none text-right" :style="{ color: 'var(--text-muted)' }">y(t)=</span>
+                  <input
+                    v-model="f.paramY"
+                    @keyup.enter="redraw"
+                    @blur="redraw"
+                    @focus="router.onFocus"
+                    @keydown.capture="router.onKeydownCapture"
+                    :readonly="router.readonly"
+                    class="flex-1 rounded-lg px-2 py-1 text-[11px] sm:text-xs
+                           font-mono focus:outline-none w-0 min-w-0"
+                    :style="{ background: 'var(--input-bg)', borderColor: 'var(--input-border)', color: 'var(--input-text)' }"
+                    style="border-width:1px"
+                    placeholder="sin(t) + b*sin(2t)"
+                  />
+                </div>
+              </div>
+            </template>
+            <div class="flex items-center gap-2 flex-wrap">
+              <button @click="addFunc" class="text-[11px] px-2 py-1 rounded-md"
+                      :style="{ background: 'var(--chip-bg)', color: 'var(--primary-text)' }">
+                + y=f(x)
+              </button>
+              <button @click="addParametric" class="text-[11px] px-2 py-1 rounded-md"
+                      :style="{ background: 'var(--chip-bg)', color: 'var(--text)' }">
+                + x(t), y(t)
+              </button>
             </div>
-            <button @click="addFunc" class="text-[11px] px-2 py-1" :style="{ color: 'var(--primary-text)' }">{{ t('graph.addFunc') }}</button>
+            <!-- 全局参数绑定 -->
+            <div class="pt-1.5 mt-1 border-t border-white/10">
+              <div class="text-[10px] mb-1" :style="{ color: 'var(--text-muted)' }">📎 {{ t('graph.paramBindings') }}</div>
+              <div class="grid grid-cols-8 gap-1">
+                <template v-for="(val, key) in paramBindings" :key="key">
+                  <label class="flex flex-col items-center gap-0.5">
+                    <span class="text-[9px]" :style="{ color: 'var(--text-dim)' }">{{ key }}</span>
+                    <input type="number" step="any"
+                           :value="val"
+                           @change="(e:any) => { paramBindings[key] = parseFloat(e.target.value) || 0; redraw() }"
+                           class="w-full rounded px-1 py-0.5 text-[10px] font-mono text-center focus:outline-none"
+                           :style="{ background: 'var(--input-bg)', borderColor: 'var(--input-border)', color: 'var(--input-text)' }"
+                           style="border-width:1px" />
+                  </label>
+                </template>
+              </div>
+              <!-- 参数 t 范围 -->
+              <div class="mt-2 flex items-center gap-2 flex-wrap">
+                <span class="text-[10px]" :style="{ color: 'var(--text-muted)' }">t ∈ [</span>
+                <input type="number" step="any"
+                       :value="paramTRange.min"
+                       @change="(e:any) => { paramTRange.min = parseFloat(e.target.value) || 0; redraw() }"
+                       class="w-20 rounded px-1.5 py-0.5 text-[10px] font-mono focus:outline-none"
+                       :style="{ background: 'var(--input-bg)', borderColor: 'var(--input-border)', color: 'var(--input-text)' }"
+                       style="border-width:1px" />
+                <span class="text-[10px]" :style="{ color: 'var(--text-muted)' }">,</span>
+                <input type="number" step="any"
+                       :value="paramTRange.max"
+                       @change="(e:any) => { paramTRange.max = parseFloat(e.target.value) || 6.28; redraw() }"
+                       class="w-20 rounded px-1.5 py-0.5 text-[10px] font-mono focus:outline-none"
+                       :style="{ background: 'var(--input-bg)', borderColor: 'var(--input-border)', color: 'var(--input-text)' }"
+                       style="border-width:1px" />
+                <span class="text-[10px]" :style="{ color: 'var(--text-muted)' }">]</span>
+              </div>
+            </div>
           </div>
 
           <!-- 模式切换栏 -->
@@ -195,11 +292,27 @@ const colors = [
 ]
 let colorIdx = 0
 
-interface FuncDef { expr: string; color: string; enabled: boolean }
+// kind: 'y(x)' 标准 y=f(x) 模式，'param' 参数方程 x(t),y(t)
+interface FuncDef {
+  kind: 'yx' | 'param'
+  expr: string                  // y(x): 'y = f(x)';  param: 'x(t)=...; y(t)=...' 或 用 paramX/paramY
+  paramX?: string               // 参数方程 x(t) 表达式（kind=param）
+  paramY?: string               // 参数方程 y(t) 表达式（kind=param）
+  color: string
+  enabled: boolean
+}
 const funcs = reactive<FuncDef[]>([
-  { expr: '', color: colors[0], enabled: true }
+  { kind: 'yx', expr: '', color: colors[0], enabled: true }
 ])
 colorIdx = 1
+
+// 全局参数绑定：除自变量（x 或 t）以外的字母变量数值
+const paramBindings = reactive<Record<string, number>>({
+  a: 1, b: 1, c: 0, m: 1, n: 1, k: 1, d: 1, z: 0
+})
+
+// 参数方程 t 取值范围
+const paramTRange = reactive<{ min: number; max: number }>({ min: 0, max: 6.2831853 })
 
 // 视图状态：数学坐标系中心 + 缩放
 const centerX = ref(0)
@@ -278,7 +391,25 @@ let ctx: CanvasRenderingContext2D | null = null
 let rafId = 0
 
 function addFunc() {
-  funcs.push({ expr: '', color: colors[colorIdx++ % colors.length], enabled: true })
+  funcs.push({ kind: 'yx', expr: '', color: colors[colorIdx++ % colors.length], enabled: true })
+}
+
+function addParametric() {
+  funcs.push({ kind: 'param', expr: '', paramX: 'cos(t)', paramY: 'sin(t)', color: colors[colorIdx++ % colors.length], enabled: true })
+}
+
+function toggleFuncKind(i: number) {
+  const f = funcs[i]
+  if (f.kind === 'yx') {
+    f.kind = 'param'
+    f.paramX = 'cos(t)'
+    f.paramY = 'sin(t)'
+  } else {
+    f.kind = 'yx'
+    f.paramX = ''
+    f.paramY = ''
+  }
+  redraw()
 }
 
 function removeFunc(i: number) {
@@ -550,20 +681,24 @@ function pxToMath(px: number, py: number): [number, number] {
   return [(px - cw / 2) / scale.value + centerX.value, -(py - ch / 2) / scale.value + centerY.value]
 }
 
-function evalFunc(expr: string, x: number, angleMode: AngleMode): number {
+function evalWith(expr: string, vars: Record<string, number>): number {
   try {
-    const result = evaluate(expr.replace(/y\s*=/, '').replace(/π/g, 'pi').trim(), {
-      angleMode,
+    const v = { ...vars, ...paramBindings, pi: Math.PI, e: Math.E }
+    return evaluate(expr.replace(/y\s*=/, '').replace(/x\(t\)\s*=|y\(t\)\s*=/g, '').replace(/π/g, 'pi').trim(), {
+      angleMode: props.state.angleMode,
       mode: 'COMP',
       baseN: 'DEC',
-      variables: { x, pi: Math.PI, e: Math.E },
+      variables: v as any,
       ans: 0,
       complex: false
     })
-    return result
   } catch {
     return NaN
   }
+}
+
+function evalFunc(expr: string, x: number, angleMode: AngleMode): number {
+  return evalWith(expr, { x })
 }
 
 function drawGrid() {
@@ -644,7 +779,7 @@ function drawGrid() {
 }
 
 function drawFunc(f: FuncDef) {
-  if (!ctx || !f.expr.trim()) return
+  if (!ctx) return
   ctx.strokeStyle = f.color
   ctx.lineWidth = 2
   ctx.lineJoin = 'round'
@@ -652,6 +787,38 @@ function drawFunc(f: FuncDef) {
   ctx.shadowColor = f.color
   ctx.shadowBlur = 6
 
+  if (f.kind === 'param') {
+    const exX = f.paramX?.trim()
+    const exY = f.paramY?.trim()
+    if (!exX || !exY) { ctx.shadowBlur = 0; return }
+    // 参数方程：t 在 [paramTRange.min, paramTRange.max] 均匀采样
+    const samples = Math.max(400, Math.round(cw * 1.5))
+    const dt = (paramTRange.max - paramTRange.min) / samples
+    let prevXpx: number | null = null
+    let prevYpx: number | null = null
+    let prevValid = false
+    ctx.beginPath()
+    for (let i = 0; i <= samples; i++) {
+      const t = paramTRange.min + i * dt
+      const x = evalWith(exX, { t })
+      const y = evalWith(exY, { t })
+      if (!isFinite(x) || !isFinite(y)) { prevValid = false; prevXpx = null; prevYpx = null; continue }
+      const [px, py] = mathToPx(x, y)
+      if (prevValid && prevXpx !== null && prevYpx !== null &&
+          (Math.abs(px - prevXpx) > cw || Math.abs(py - prevYpx) > ch)) {
+        prevValid = false
+      }
+      if (!prevValid) ctx.moveTo(px, py)
+      else ctx.lineTo(px, py)
+      prevXpx = px; prevYpx = py; prevValid = true
+    }
+    ctx.stroke()
+    ctx.shadowBlur = 0
+    return
+  }
+
+  // y(x) 标准模式
+  if (!f.expr.trim()) { ctx.shadowBlur = 0; return }
   const step = 1 // 每像素采样
   let prevY: number | null = null
   let prevValid = false
