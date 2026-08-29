@@ -66,7 +66,8 @@ export const messages = {
       ':': '冒号（Python 代码块）',
       '<': '小于号（Python 比较）',
       '>': '大于号（Python 比较）',
-      '↵': '换行（Python 多行代码）'
+      '↵': '换行（Python 多行代码）',
+      'VAR': '未知数面板 — 打开字母/大写/希腊字母小键盘'
     },
     tabs: {
       calc: '计算',
@@ -202,6 +203,14 @@ export const messages = {
       loop: '',
       math: '',
       matrix: ''
+    },
+    var: {
+      title: '未知数面板',
+      subtitle: '字母 · 大写 · 希腊字母 — 连续点击输入',
+      lowercase: '小写字母 (a-z)',
+      uppercase: '大写字母 (A-Z)',
+      greek: '希腊字母（常用数学符号）',
+      tip: '点击「VAR / 未知数」按钮随时打开本面板 · 按 ESC 关闭 · 可连续输入'
     }
   },
 
@@ -261,7 +270,8 @@ export const messages = {
       SPC: 'Space (matrix/data separator)',
       ';': 'Semicolon (matrix row separator)',
       ':': 'Colon (Python block)', '<': 'Less than', '>': 'Greater than',
-      '↵': 'Newline (Python multiline)'
+      '↵': 'Newline (Python multiline)',
+      'VAR': 'Variable panel — open letter/uppercase/Greek keypad'
     },
     tabs: { calc: 'Calc', graph: 'Graph', eqn: 'Equations', mat: 'Matrices', vec: 'Vectors', stat: 'Stats', 'calc-mod': 'Calculus', python: 'Python' },
     screen: {
@@ -323,7 +333,15 @@ export const messages = {
       pyodide: { tip: 'Click "Load Python" to enable Pyodide (WebAssembly, ~10MB)' },
       examples: { basic: 'Basic Operations', func: 'Define Function', loop: 'Loops & Lists', math: 'Math Calculations', matrix: 'Matrix Operations' }
     },
-    code: { default: '', basic: '', func: '', loop: '', math: '', matrix: '' }
+    code: { default: '', basic: '', func: '', loop: '', math: '', matrix: '' },
+    var: {
+      title: 'Variable Panel',
+      subtitle: 'Lowercase · Uppercase · Greek — tap continuously to enter',
+      lowercase: 'Lowercase letters (a-z)',
+      uppercase: 'Uppercase letters (A-Z)',
+      greek: 'Greek letters (common math symbols)',
+      tip: 'Click VAR button anytime · ESC to close · continuous input enabled'
+    }
   },
 
   'zh-TW': {
@@ -378,7 +396,8 @@ export const messages = {
       '=': '等號 — 執行計算或方程式指定',
       SPC: '空白（矩陣/資料分隔）', ';': '分號（矩陣列分隔）',
       ':': '冒號（Python 程式區塊）', '<': '小於（Python 比較）',
-      '>': '大於（Python 比較）', '↵': '換行（Python 多行程式）'
+      '>': '大於（Python 比較）', '↵': '換行（Python 多行程式）',
+      'VAR': '未知數面板 — 開啟字母/大寫/希臘字母小鍵盤'
     },
     tabs: { calc: '計算', graph: '繪圖', eqn: '方程', mat: '矩陣', vec: '向量', stat: '統計', 'calc-mod': '微積分', python: 'Python' },
     screen: {
@@ -453,7 +472,15 @@ export const messages = {
       pyodide: { tip: '點擊右上角「載入 Python」以啟用 Pyodide（WebAssembly，約10MB）' },
       examples: { basic: '基本運算', func: '定義函式', loop: '迴圈與列表', math: '數學計算', matrix: '矩陣運算' }
     },
-    code: { default: '', basic: '', func: '', loop: '', math: '', matrix: '' }
+    code: { default: '', basic: '', func: '', loop: '', math: '', matrix: '' },
+    var: {
+      title: '未知數面板',
+      subtitle: '字母 · 大寫 · 希臘字母 — 連續點擊輸入',
+      lowercase: '小寫字母 (a-z)',
+      uppercase: '大寫字母 (A-Z)',
+      greek: '希臘字母（常用數學符號）',
+      tip: '點擊「VAR / 未知數」按鈕隨時開啟本面板 · 按 ESC 關閉 · 可連續輸入'
+    }
   },
 
   'ja-JP': {
@@ -507,7 +534,8 @@ export const messages = {
       '=': '等号 — 計算実行または代入',
       SPC: 'スペース（行列/データ区切り）', ';': 'セミコロン（行列行区切り）',
       ':': 'コロン（Python コードブロック）', '<': '小なり（Python 比較）',
-      '>': '大なり（Python 比較）', '↵': '改行（Python 複数行）'
+      '>': '大なり（Python 比較）', '↵': '改行（Python 複数行）',
+      'VAR': '変数パネル — 文字/大文字/ギリシャ文字キーパッドを開く'
     },
     tabs: { calc: '計算', graph: 'グラフ', eqn: '方程式', mat: '行列', vec: 'ベクトル', stat: '統計', 'calc-mod': '微積分', python: 'Python' },
     screen: {
@@ -582,7 +610,15 @@ export const messages = {
       pyodide: { tip: '右上「Python を読込」をクリックして Pyodide を有効化（WebAssembly、約10MB）' },
       examples: { basic: '基本演算', func: '関数定義', loop: 'ループとリスト', math: '数学', matrix: '行列演算' }
     },
-    code: { default: '', basic: '', func: '', loop: '', math: '', matrix: '' }
+    code: { default: '', basic: '', func: '', loop: '', math: '', matrix: '' },
+    var: {
+      title: '変数パネル',
+      subtitle: '小文字 · 大文字 · ギリシャ文字 — 連続タップで入力',
+      lowercase: '小文字 (a-z)',
+      uppercase: '大文字 (A-Z)',
+      greek: 'ギリシャ文字（数学記号）',
+      tip: 'VAR ボタンでいつでも開く · ESC で閉じる · 連続入力可能'
+    }
   },
 
   'ru-RU': {
@@ -637,7 +673,8 @@ export const messages = {
       '=': 'Равно — выполнить вычисление или присваивание',
       SPC: 'Пробел (разделитель матриц/данных)', ';': 'Точка с запятой (разделитель строк матрицы)',
       ':': 'Двоеточие (блок Python)', '<': 'Меньше (сравнение Python)',
-      '>': 'Больше (сравнение Python)', '↵': 'Перевод строки (многострочный Python)'
+      '>': 'Больше (сравнение Python)', '↵': 'Перевод строки (многострочный Python)',
+      'VAR': 'Панель переменных — открыть клавиатуру букв/регистра/греч.'
     },
     tabs: { calc: 'Расчёт', graph: 'График', eqn: 'Уравнения', mat: 'Матрицы', vec: 'Векторы', stat: 'Статистика', 'calc-mod': 'Мат. анализ', python: 'Python' },
     screen: {
@@ -713,7 +750,15 @@ export const messages = {
       pyodide: { tip: 'Нажмите «Загрузить Python» сверху справа, чтобы включить Pyodide (WebAssembly, ~10МБ)' },
       examples: { basic: 'Базовые операции', func: 'Функции', loop: 'Циклы и списки', math: 'Математика', matrix: 'Матрицы' }
     },
-    code: { default: '', basic: '', func: '', loop: '', math: '', matrix: '' }
+    code: { default: '', basic: '', func: '', loop: '', math: '', matrix: '' },
+    var: {
+      title: 'Панель переменных',
+      subtitle: 'Строчные · Заглавные · Греческие — нажимайте подряд',
+      lowercase: 'Строчные буквы (a-z)',
+      uppercase: 'Заглавные буквы (A-Z)',
+      greek: 'Греческие буквы (мат. символы)',
+      tip: 'Кнопка VAR открывает · ESC закрывает · непрерывный ввод'
+    }
   },
 
   'fr-FR': {
@@ -768,7 +813,8 @@ export const messages = {
       '=': 'Égal — calcule ou affecte',
       SPC: 'Espace (séparateur matrice/données)', ';': 'Point-virgule (séparateur lignes matrice)',
       ':': 'Deux-points (bloc Python)', '<': 'Inférieur (comparaison Python)',
-      '>': 'Supérieur (comparaison Python)', '↵': 'Saut de ligne (Python multiligne)'
+      '>': 'Supérieur (comparaison Python)', '↵': 'Saut de ligne (Python multiligne)',
+      'VAR': 'Panneau de variables — ouvrir le pavé lettres/majuscules/grec'
     },
     tabs: { calc: 'Calcul', graph: 'Graphiques', eqn: 'Équations', mat: 'Matrices', vec: 'Vecteurs', stat: 'Stats', 'calc-mod': 'Analyse', python: 'Python' },
     screen: {
@@ -844,7 +890,15 @@ export const messages = {
       pyodide: { tip: 'Cliquez sur « Charger Python » en haut à droite pour activer Pyodide (WebAssembly, ~10Mo)' },
       examples: { basic: 'Opérations de base', func: 'Fonctions', loop: 'Boucles et listes', math: 'Mathématiques', matrix: 'Matrices' }
     },
-    code: { default: '', basic: '', func: '', loop: '', math: '', matrix: '' }
+    code: { default: '', basic: '', func: '', loop: '', math: '', matrix: '' },
+    var: {
+      title: 'Panneau de variables',
+      subtitle: 'Minuscules · Majuscules · Grec — appuyez à la suite',
+      lowercase: 'Lettres minuscules (a-z)',
+      uppercase: 'Lettres majuscules (A-Z)',
+      greek: 'Lettres grecques (symboles math.)',
+      tip: 'Bouton VAR ouvre · Échap ferme · saisie continue'
+    }
   },
 
   'de-DE': {
@@ -899,7 +953,8 @@ export const messages = {
       '=': 'Gleichheit — Berechnung durchführen oder zuweisen',
       SPC: 'Leerzeichen (Matrix/Daten-Trenner)', ';': 'Semikolon (Matrix-Zeilenseparator)',
       ':': 'Doppelpunkt (Python-Block)', '<': 'Kleiner (Vergleich Python)',
-      '>': 'Größer (Vergleich Python)', '↵': 'Zeilenumbruch (mehrzeiliges Python)'
+      '>': 'Größer (Vergleich Python)', '↵': 'Zeilenumbruch (mehrzeiliges Python)',
+      'VAR': 'Variablen-Panel — Buchstaben/Groß/Griechisch-Tastatur öffnen'
     },
     tabs: { calc: 'Rechner', graph: 'Grafik', eqn: 'Gleichungen', mat: 'Matrizen', vec: 'Vektoren', stat: 'Statistik', 'calc-mod': 'Analysis', python: 'Python' },
     screen: {
@@ -975,7 +1030,15 @@ export const messages = {
       pyodide: { tip: 'Klicken Sie oben rechts auf „Python laden”, um Pyodide zu aktivieren (WebAssembly, ~10MB)' },
       examples: { basic: 'Grundrechenarten', func: 'Funktionen', loop: 'Schleifen und Listen', math: 'Mathematik', matrix: 'Matrizen' }
     },
-    code: { default: '', basic: '', func: '', loop: '', math: '', matrix: '' }
+    code: { default: '', basic: '', func: '', loop: '', math: '', matrix: '' },
+    var: {
+      title: 'Variablen-Panel',
+      subtitle: 'Klein · Groß · Griechisch — zum Eingeben nacheinander tippen',
+      lowercase: 'Kleinbuchstaben (a-z)',
+      uppercase: 'Großbuchstaben (A-Z)',
+      greek: 'Griechische Buchstaben (Math.-Symbole)',
+      tip: 'VAR-Schaltfläche öffnet · ESC schließt · Dauereingabe aktiviert'
+    }
   }
 } as const
 

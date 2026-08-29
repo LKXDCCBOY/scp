@@ -26,11 +26,11 @@
     <span class="display-text relative z-10 select-none pointer-events-none whitespace-nowrap"
           :class="sizeClass">{{ mainLabel }}</span>
 
-    <!-- 右下：下标/补充说明 -->
-    <span v-if="subHint"
+    <!-- 右下：下标/补充说明（优先显示按键自带 subLabel；SHIFT 激活时回退显示原 label） -->
+    <span v-if="displayHint"
           class="absolute right-1.5 bottom-1 text-[8px] sm:text-[9px] text-white/35
                  pointer-events-none leading-none">
-      {{ subHint }}
+      {{ displayHint }}
     </span>
 
     <!-- 涟漪动画 -->
@@ -105,6 +105,9 @@ const subHint = computed(() => {
   }
   return undefined
 })
+
+// 优先显示按键自带 subLabel（如 "未知数"），SHIFT 激活时回退到被覆盖的原始 label
+const displayHint = computed(() => subHint.value ?? props.item.subLabel)
 
 function onPointerDown(e: PointerEvent) {
   if (props.item.disabled) return
