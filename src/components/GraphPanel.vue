@@ -2,28 +2,56 @@
   <div :class="isFullscreen
     ? 'fixed inset-0 z-50 bg-slate-900/95 backdrop-blur-2xl p-4 flex flex-col min-h-0'
     : 'glass-panel p-3 sm:p-4 w-full h-full flex flex-col min-h-0'">
-    <!-- 左上角菜单按钮（全屏时显示） -->
-    <button v-if="isFullscreen && !menuOpen"
-            @click="menuOpen = true"
+    <!-- 全屏控制栏遮罩（点击关闭） -->
+    <div v-if="isFullscreen && menuOpen"
+         @click="menuOpen = false"
+         class="fixed inset-0 z-30 bg-black/20"></div>
+
+    <!-- 左上角菜单按钮（全屏时显示，toggle 打开/收起） -->
+    <button v-if="isFullscreen"
+            @click="menuOpen = !menuOpen"
             class="absolute top-3 left-3 z-40 w-9 h-9 rounded-lg bg-black/40 border border-white/15 text-white/80 backdrop-blur-md
                    flex items-center justify-center hover:bg-black/60 hover:scale-105 active:scale-95 transition">
-      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <svg v-if="!menuOpen" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <line x1="3" y1="6" x2="21" y2="6"/>
         <line x1="3" y1="12" x2="21" y2="12"/>
         <line x1="3" y1="18" x2="21" y2="18"/>
+      </svg>
+      <svg v-else viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="6" y1="6" x2="18" y2="18"/>
+        <line x1="18" y1="6" x2="6" y2="18"/>
       </svg>
     </button>
 
     <!-- 下拉控制栏（全屏时从上方弹出） -->
     <transition name="slide-down">
       <div v-if="!isFullscreen || menuOpen"
-           class="flex-none relative z-40">
+           class="flex-none relative z-40"
+           @click.stop>
         <!-- 控制栏外框（全屏时毛玻璃） -->
         <div :class="isFullscreen ? 'rounded-xl bg-slate-900/85 border border-white/15 backdrop-blur-xl p-3 mb-2' : ''">
           <!-- 工具栏 -->
           <div class="flex-none flex items-center gap-2 mb-2 flex-wrap">
             <span class="text-xs sm:text-sm font-medium" :style="{ color: 'var(--text-dim)' }">{{ t('graph.title') }}</span>
+            <!-- 全屏状态下显示选中函数提示 -->
+            <span v-if="isFullscreen && toolMode === 'construct' && selectedFuncIdx >= 0"
+                  class="text-[10px] px-2 py-0.5 rounded-full border"
+                  :style="{ background: funcs[selectedFuncIdx]?.color + '33', borderColor: funcs[selectedFuncIdx]?.color, color: funcs[selectedFuncIdx]?.color }">
+              f{{ selectedFuncIdx + 1 }} {{ t('graph.selected') }}
+            </span>
             <div class="flex-1"></div>
+            <!-- 全屏模式下关闭按钮 -->
+            <button v-if="isFullscreen"
+                    @click="menuOpen = false"
+                    class="text-[11px] w-7 h-7 rounded-lg border flex items-center justify-center transition hover:bg-white/10"
+                    :style="{ borderColor: 'var(--chip-border)', color: 'var(--text-muted)' }"
+                    style="border-width:1px"
+                    :title="t('graph.closePanel')">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="6" y1="6" x2="18" y2="18"/>
+                <line x1="18" y1="6" x2="6" y2="18"/>
+              </svg>
+            </button>
             <button @click="resetView"
                     class="text-[11px] px-2 py-1 rounded-lg transition"
                     :style="{ background: 'var(--chip-bg)', borderColor: 'var(--chip-border)', color: 'var(--text)' }"
@@ -53,9 +81,20 @@
           <div class="flex-none space-y-1.5 overflow-y-auto scrollbar-thin"
                :class="isFullscreen ? 'max-h-[240px]' : 'max-h-[140px]'">
             <template v-for="(f, i) in funcs" :key="i">
+              <!-- 选中状态：y=f(x)/参数：func 选中 => selectedFuncIdx===i；交点工具第二步也高亮 -->
               <!-- y = f(x) 模式 -->
-              <div v-if="f.kind === 'yx'" class="flex items-center gap-1.5">
-                <span class="w-4 h-4 rounded-full flex-none border border-white/20" :style="{ background: f.color }"></span>
+              <div v-if="f.kind === 'yx'"
+                   class="flex items-center gap-1.5 rounded-lg px-1.5 py-1 transition-all"
+                   :class="i === selectedFuncIdx ? 'ring-2 scale-[1.01]' : ''"
+                   :style="i === selectedFuncIdx
+                     ? { background: f.color + '22', boxShadow: `0 0 0 2px ${f.color}`, borderColor: f.color }
+                     : {}">
+                <span class="w-4 h-4 rounded-full flex-none border border-white/20 shrink-0"
+                      :class="i === selectedFuncIdx ? 'ring-2 ring-white/70 scale-110' : ''"
+                      :style="{ background: f.color }"></span>
+                <span v-if="i === selectedFuncIdx"
+                      class="text-[9px] font-bold px-1.5 py-0.5 rounded shrink-0"
+                      :style="{ background: f.color, color: '#fff' }">{{ t('graph.selectedBadge') }}</span>
                 <button @click="toggleFuncKind(i)"
                         class="text-[9px] flex-none w-14 rounded-md py-0.5 font-medium transition hover:opacity-80"
                         :style="{ background: 'var(--chip-bg)', color: 'var(--text-muted)' }"
@@ -69,7 +108,9 @@
                   :readonly="router.readonly"
                   class="flex-1 rounded-lg px-2 py-1 text-xs sm:text-sm
                          font-mono focus:outline-none w-0 min-w-0"
-                  :style="{ background: 'var(--input-bg)', borderColor: 'var(--input-border)', color: 'var(--input-text)' }"
+                  :style="i === selectedFuncIdx
+                    ? { background: f.color + '33', borderColor: f.color, color: 'var(--input-text)', boxShadow: `0 0 0 1px ${f.color}` }
+                    : { background: 'var(--input-bg)', borderColor: 'var(--input-border)', color: 'var(--input-text)' }"
                   style="border-width:1px"
                   :placeholder="t('graph.placeholder')"
                 />
@@ -79,9 +120,19 @@
                 <button @click="removeFunc(i)" class="text-[11px] text-rose-400/70 hover:text-rose-400 px-1 flex-none">x</button>
               </div>
               <!-- 参数方程 x(t), y(t) 模式 -->
-              <div v-else class="space-y-1">
+              <div v-else
+                   class="space-y-1 rounded-lg px-1.5 py-1 transition-all"
+                   :class="i === selectedFuncIdx ? 'ring-2 scale-[1.01]' : ''"
+                   :style="i === selectedFuncIdx
+                     ? { background: f.color + '22', boxShadow: `0 0 0 2px ${f.color}`, borderColor: f.color }
+                     : {}">
                 <div class="flex items-center gap-1.5">
-                  <span class="w-4 h-4 rounded-full flex-none border border-white/20" :style="{ background: f.color }"></span>
+                  <span class="w-4 h-4 rounded-full flex-none border border-white/20 shrink-0"
+                        :class="i === selectedFuncIdx ? 'ring-2 ring-white/70 scale-110' : ''"
+                        :style="{ background: f.color }"></span>
+                  <span v-if="i === selectedFuncIdx"
+                        class="text-[9px] font-bold px-1.5 py-0.5 rounded shrink-0"
+                        :style="{ background: f.color, color: '#fff' }">{{ t('graph.selectedBadge') }}</span>
                   <button @click="toggleFuncKind(i)"
                           class="text-[9px] flex-none w-14 rounded-md py-0.5 font-medium transition hover:opacity-80"
                           :style="{ background: 'var(--primary-bg)', color: 'var(--primary-text)' }"
@@ -96,7 +147,9 @@
                     :readonly="router.readonly"
                     class="flex-1 rounded-lg px-2 py-1 text-[11px] sm:text-xs
                            font-mono focus:outline-none w-0 min-w-0"
-                    :style="{ background: 'var(--input-bg)', borderColor: 'var(--input-border)', color: 'var(--input-text)' }"
+                    :style="i === selectedFuncIdx
+                      ? { background: f.color + '33', borderColor: f.color, color: 'var(--input-text)', boxShadow: `0 0 0 1px ${f.color}` }
+                      : { background: 'var(--input-bg)', borderColor: 'var(--input-border)', color: 'var(--input-text)' }"
                     style="border-width:1px"
                     placeholder="cos(t) + a*cos(3t)"
                   />
@@ -116,7 +169,9 @@
                     :readonly="router.readonly"
                     class="flex-1 rounded-lg px-2 py-1 text-[11px] sm:text-xs
                            font-mono focus:outline-none w-0 min-w-0"
-                    :style="{ background: 'var(--input-bg)', borderColor: 'var(--input-border)', color: 'var(--input-text)' }"
+                    :style="i === selectedFuncIdx
+                      ? { background: f.color + '33', borderColor: f.color, color: 'var(--input-text)', boxShadow: `0 0 0 1px ${f.color}` }
+                      : { background: 'var(--input-bg)', borderColor: 'var(--input-border)', color: 'var(--input-text)' }"
                     style="border-width:1px"
                     placeholder="sin(t) + b*sin(2t)"
                   />
@@ -184,7 +239,7 @@
                       ? { background: 'var(--primary-bg)', borderColor: 'var(--primary-text)', color: 'var(--primary-text)' }
                       : { background: 'var(--chip-bg)', borderColor: 'var(--chip-border)', color: 'var(--text-muted)' }"
                     style="border-width:1px">{{ t('graph.modeDraw') }}</button>
-            <button @click="toolMode = 'construct'; constructStep = 0; tempP1 = null; selectedRefIdx = -1; scheduleRedraw()"
+            <button @click="toolMode = 'construct'; constructStep = 0; tempP1 = null; selectedRefIdx = -1; selectedFuncIdx = -1; scheduleRedraw()"
                     class="text-[10px] px-2.5 py-1 rounded-lg border transition"
                     :style="toolMode === 'construct'
                       ? { background: 'var(--primary-bg)', borderColor: 'var(--primary-text)', color: 'var(--primary-text)' }
@@ -212,7 +267,7 @@
             <template v-if="toolMode === 'construct'">
               <div class="flex items-center gap-1 ml-2 flex-wrap">
                 <button v-for="ct in constructTools" :key="ct.id"
-                        @click="constructTool = ct.id; constructStep = 0; tempP1 = null; selectedRefIdx = -1"
+                        @click="constructTool = ct.id; constructStep = 0; tempP1 = null; selectedRefIdx = -1; selectedFuncIdx = -1"
                         class="text-[10px] px-2 py-1 rounded-lg border transition"
                         :style="constructTool === ct.id
                           ? { background: 'var(--primary-bg)', borderColor: 'var(--primary-text)', color: 'var(--primary-text)' }
@@ -348,12 +403,15 @@ interface GeoIntersection { type: 'intersection'; funcA: number; funcB: number; 
 type GeoObj = GeoPoint | GeoLine | GeoSegment | GeoParallel | GeoPerp | GeoIntersection
 const geoObjects = ref<GeoObj[]>([])
 let geoLabelIdx = 1
-// 构造步骤状态
-let constructing = false
-let constructStep = 0 // 0=第一步, 1=第二步
-let tempP1: [number, number] | null = null
-// 构造中选中的参考对象（用于平行/垂线）
-let selectedRefIdx = -1
+// 构造步骤状态（ref 以便与 UI 响应）
+const constructStep = ref(0) // 0=第一步, 1=第二步
+const tempP1 = ref<[number, number] | null>(null)
+// 构造中选中的参考对象：
+// - parallel/perp：指向 geoObjects 中直线/线段的索引
+// - intersection 两步：指向 funcs 中的函数索引
+const selectedRefIdx = ref(-1)
+// intersection 第一步后已锁定的函数索引（funcA），用于区分当前等待点击的 funcB
+const selectedFuncIdx = ref(-1)
 
 // 涂鸦颜色选项
 const drawColors = ['#4f8cff', '#f43f5e', '#10b981', '#f59e0b', '#a855f7', '#06b6d4', '#ec4899', '#ffffff']
@@ -370,18 +428,19 @@ const constructTools: { id: ConstructTool; key: string }[] = [
 
 const constructHint = computed(() => {
   const tool = constructTool.value
+  const step = constructStep.value
   if (tool === 'point') return t('graph.hintPoint')
   if (tool === 'line' || tool === 'segment') {
-    return constructStep === 0 ? t('graph.hintLine1') : t('graph.hintLine2')
+    return step === 0 ? t('graph.hintLine1') : t('graph.hintLine2')
   }
   if (tool === 'parallel') {
-    return constructStep === 0 ? t('graph.hintParallel1') : t('graph.hintParallel2')
+    return step === 0 ? t('graph.hintParallel1') : t('graph.hintParallel2')
   }
   if (tool === 'perp') {
-    return constructStep === 0 ? t('graph.hintParallel1') : t('graph.hintParallel2')
+    return step === 0 ? t('graph.hintParallel1') : t('graph.hintParallel2')
   }
   if (tool === 'intersection') {
-    return constructStep === 0 ? t('graph.hintIntersect1') : t('graph.hintIntersect2')
+    return step === 0 ? t('graph.hintIntersect1') : t('graph.hintIntersect2')
   }
   return ''
 })
@@ -536,16 +595,16 @@ function handleConstructClick(mx: number, my: number) {
     return
   }
   if (tool === 'line' || tool === 'segment') {
-    if (constructStep === 0) {
-      tempP1 = [mx, my]
-      constructStep = 1
-    } else if (tempP1) {
+    if (constructStep.value === 0) {
+      tempP1.value = [mx, my]
+      constructStep.value = 1
+    } else if (tempP1.value) {
       geoObjects.value.push({
-        type: tool, x1: tempP1[0], y1: tempP1[1], x2: mx, y2: my,
+        type: tool, x1: tempP1.value[0], y1: tempP1.value[1], x2: mx, y2: my,
         label: `L${geoLabelIdx++}`
       })
-      tempP1 = null
-      constructStep = 0
+      tempP1.value = null
+      constructStep.value = 0
     }
     scheduleRedraw()
     return
@@ -553,42 +612,43 @@ function handleConstructClick(mx: number, my: number) {
   if (tool === 'parallel' || tool === 'perp') {
     // 第一步：选择参考直线/线段
     // 第二步：选择经过的点
-    if (constructStep === 0) {
+    if (constructStep.value === 0) {
       // 找最近的线/线段
       const idx = findNearestLine(mx, my)
       if (idx >= 0) {
-        selectedRefIdx = idx
-        constructStep = 1
+        selectedRefIdx.value = idx
+        constructStep.value = 1
       }
-    } else if (selectedRefIdx >= 0) {
+    } else if (selectedRefIdx.value >= 0) {
       geoObjects.value.push({
-        type: tool, refIdx: selectedRefIdx, px: mx, py: my,
+        type: tool, refIdx: selectedRefIdx.value, px: mx, py: my,
         label: `${tool === 'parallel' ? 'Par' : 'Perp'}${geoLabelIdx++}`
       })
-      selectedRefIdx = -1
-      constructStep = 0
+      selectedRefIdx.value = -1
+      constructStep.value = 0
     }
     scheduleRedraw()
     return
   }
   if (tool === 'intersection') {
     // 选择两个函数，计算交点
-    if (constructStep === 0) {
+    if (constructStep.value === 0) {
       const idx = findNearestFunc(mx, my)
-      if (idx >= 0) { selectedRefIdx = idx; constructStep = 1 }
-    } else if (selectedRefIdx >= 0) {
+      if (idx >= 0) { selectedFuncIdx.value = idx; constructStep.value = 1 }
+    } else if (selectedFuncIdx.value >= 0) {
       const idx2 = findNearestFunc(mx, my)
-      if (idx2 >= 0 && idx2 !== selectedRefIdx) {
-        const pt = computeFuncIntersection(selectedRefIdx, idx2)
+      if (idx2 >= 0 && idx2 !== selectedFuncIdx.value) {
+        const pt = computeFuncIntersection(selectedFuncIdx.value, idx2)
         if (pt) {
           geoObjects.value.push({
-            type: 'intersection', funcA: selectedRefIdx, funcB: idx2,
+            type: 'intersection', funcA: selectedFuncIdx.value, funcB: idx2,
             x: pt[0], y: pt[1], label: `I${geoLabelIdx++}`
           })
         }
       }
-      selectedRefIdx = -1
-      constructStep = 0
+      selectedFuncIdx.value = -1
+      selectedRefIdx.value = -1
+      constructStep.value = 0
     }
     scheduleRedraw()
     return
@@ -778,26 +838,24 @@ function drawGrid() {
   ctx.fillText('0', ox - 6, oy + 4)
 }
 
-function drawFunc(f: FuncDef) {
+function drawFunc(f: FuncDef, idx = -1) {
   if (!ctx) return
-  ctx.strokeStyle = f.color
-  ctx.lineWidth = 2
+  // 选中状态：构造-交点工具第一步后高亮 selectedFuncIdx
+  const isFuncSelected = toolMode.value === 'construct' && constructTool.value === 'intersection' && idx === selectedFuncIdx.value
+  const color = f.color
   ctx.lineJoin = 'round'
   ctx.lineCap = 'round'
-  ctx.shadowColor = f.color
-  ctx.shadowBlur = 6
+  const path = new Path2D()
 
   if (f.kind === 'param') {
     const exX = f.paramX?.trim()
     const exY = f.paramY?.trim()
-    if (!exX || !exY) { ctx.shadowBlur = 0; return }
-    // 参数方程：t 在 [paramTRange.min, paramTRange.max] 均匀采样
+    if (!exX || !exY) return
     const samples = Math.max(400, Math.round(cw * 1.5))
     const dt = (paramTRange.max - paramTRange.min) / samples
     let prevXpx: number | null = null
     let prevYpx: number | null = null
     let prevValid = false
-    ctx.beginPath()
     for (let i = 0; i <= samples; i++) {
       const t = paramTRange.min + i * dt
       const x = evalWith(exX, { t })
@@ -808,41 +866,57 @@ function drawFunc(f: FuncDef) {
           (Math.abs(px - prevXpx) > cw || Math.abs(py - prevYpx) > ch)) {
         prevValid = false
       }
-      if (!prevValid) ctx.moveTo(px, py)
-      else ctx.lineTo(px, py)
+      if (!prevValid) path.moveTo(px, py)
+      else path.lineTo(px, py)
       prevXpx = px; prevYpx = py; prevValid = true
     }
-    ctx.stroke()
+  } else {
+    // y(x) 标准模式
+    if (!f.expr.trim()) return
+    const step = 1
+    let prevY: number | null = null
+    let prevValid = false
+    for (let px = 0; px <= cw; px += step) {
+      const x = (px - cw / 2) / scale.value + centerX.value
+      const y = evalFunc(f.expr, x, props.state.angleMode)
+      if (!isFinite(y)) { prevValid = false; prevY = null; continue }
+      const py = ch / 2 - (y - centerY.value) * scale.value
+      if (prevValid && prevY !== null && Math.abs(py - prevY) > ch) {
+        prevValid = false
+      }
+      if (!prevValid) path.moveTo(px, py)
+      else path.lineTo(px, py)
+      prevY = py
+      prevValid = true
+    }
+  }
+
+  if (isFuncSelected) {
+    // 外层发光
+    ctx.save()
+    ctx.strokeStyle = color
+    ctx.globalAlpha = 0.35
+    ctx.lineWidth = 10
+    ctx.shadowColor = color
+    ctx.shadowBlur = 30
+    ctx.stroke(path)
+    ctx.restore()
+    // 内层实线
+    ctx.save()
+    ctx.strokeStyle = color
+    ctx.lineWidth = 4.5
+    ctx.shadowColor = color
+    ctx.shadowBlur = 20
+    ctx.stroke(path)
+    ctx.restore()
+  } else {
+    ctx.strokeStyle = color
+    ctx.lineWidth = 2
+    ctx.shadowColor = color
+    ctx.shadowBlur = 6
+    ctx.stroke(path)
     ctx.shadowBlur = 0
-    return
   }
-
-  // y(x) 标准模式
-  if (!f.expr.trim()) { ctx.shadowBlur = 0; return }
-  const step = 1 // 每像素采样
-  let prevY: number | null = null
-  let prevValid = false
-
-  ctx.beginPath()
-  for (let px = 0; px <= cw; px += step) {
-    const x = (px - cw / 2) / scale.value + centerX.value
-    const y = evalFunc(f.expr, x, props.state.angleMode)
-    if (!isFinite(y)) { prevValid = false; prevY = null; continue }
-    const py = ch / 2 - (y - centerY.value) * scale.value
-    if (prevValid && prevY !== null && Math.abs(py - prevY) > ch) {
-      // 跳跃过大，断开
-      prevValid = false
-    }
-    if (!prevValid) {
-      ctx.moveTo(px, py)
-    } else {
-      ctx.lineTo(px, py)
-    }
-    prevY = py
-    prevValid = true
-  }
-  ctx.stroke()
-  ctx.shadowBlur = 0
 }
 
 function drawSketches() {
@@ -871,7 +945,13 @@ function drawGeoObjects() {
   ctx.textAlign = 'left'
   ctx.textBaseline = 'middle'
 
-  for (const obj of geoObjects.value) {
+  // 当前是否在「平行/垂线」工具第一步等待选参考线
+  const pickingRef = toolMode.value === 'construct' &&
+    (constructTool.value === 'parallel' || constructTool.value === 'perp') &&
+    constructStep.value === 0
+
+  geoObjects.value.forEach((obj, i) => {
+    const isRefSelected = i === selectedRefIdx.value && constructStep.value === 1
     if (obj.type === 'point') {
       const [px, py] = mathToPx(obj.x, obj.y)
       ctx.fillStyle = '#fbbf24'
@@ -883,32 +963,57 @@ function drawGeoObjects() {
       // 延长到屏幕边界
       const dx = obj.x2 - obj.x1, dy = obj.y2 - obj.y1
       const len = Math.hypot(dx, dy)
-      if (len < 1e-12) continue
+      if (len < 1e-12) return
       const ux = dx / len, uy = dy / len
       const far = Math.max(cw, ch) / scale.value * 2
       const [px1, py1] = mathToPx(obj.x1 - ux * far, obj.y1 - uy * far)
       const [px2, py2] = mathToPx(obj.x1 + ux * far, obj.y1 + uy * far)
-      ctx.strokeStyle = '#60a5fa'; ctx.lineWidth = 1.5
+      const baseColor = '#60a5fa'
+      const isLinePickable = pickingRef || isRefSelected
+      const color = isLinePickable ? (isRefSelected ? '#fbbf24' : '#93c5fd') : baseColor
+      const w = isRefSelected ? 4 : (isLinePickable ? 2.2 : 1.5)
+      if (isRefSelected) {
+        ctx.save(); ctx.globalAlpha = 0.45; ctx.strokeStyle = color; ctx.lineWidth = 10
+        ctx.shadowColor = color; ctx.shadowBlur = 26
+        ctx.beginPath(); ctx.moveTo(px1, py1); ctx.lineTo(px2, py2); ctx.stroke(); ctx.restore()
+      }
+      ctx.strokeStyle = color; ctx.lineWidth = w
+      ctx.shadowColor = color; ctx.shadowBlur = isRefSelected ? 14 : (isLinePickable ? 8 : 4)
       ctx.beginPath(); ctx.moveTo(px1, py1); ctx.lineTo(px2, py2); ctx.stroke()
+      ctx.shadowBlur = 0
       const [lx, ly] = mathToPx((obj.x1 + obj.x2) / 2, (obj.y1 + obj.y2) / 2)
-      ctx.fillStyle = 'rgba(255,255,255,0.8)'; ctx.fillText(obj.label, lx + 5, ly)
+      ctx.fillStyle = isRefSelected ? '#fbbf24' : 'rgba(255,255,255,0.8)'
+      ctx.font = isRefSelected ? 'bold 12px JetBrains Mono, monospace' : '12px JetBrains Mono, monospace'
+      ctx.fillText(obj.label, lx + 5, ly)
     } else if (obj.type === 'segment') {
       const [px1, py1] = mathToPx(obj.x1, obj.y1)
       const [px2, py2] = mathToPx(obj.x2, obj.y2)
-      ctx.strokeStyle = '#34d399'; ctx.lineWidth = 2
+      const baseColor = '#34d399'
+      const isSegPickable = pickingRef || isRefSelected
+      const color = isRefSelected ? '#fbbf24' : (isSegPickable ? '#6ee7b7' : baseColor)
+      const w = isRefSelected ? 5 : (isSegPickable ? 3 : 2)
+      if (isRefSelected) {
+        ctx.save(); ctx.globalAlpha = 0.45; ctx.strokeStyle = color; ctx.lineWidth = 11
+        ctx.shadowColor = color; ctx.shadowBlur = 26
+        ctx.beginPath(); ctx.moveTo(px1, py1); ctx.lineTo(px2, py2); ctx.stroke(); ctx.restore()
+      }
+      ctx.strokeStyle = color; ctx.lineWidth = w
+      ctx.shadowColor = color; ctx.shadowBlur = isRefSelected ? 14 : (isSegPickable ? 8 : 4)
       ctx.beginPath(); ctx.moveTo(px1, py1); ctx.lineTo(px2, py2); ctx.stroke()
+      ctx.shadowBlur = 0
       // 端点
-      ctx.fillStyle = 'rgba(52,211,153,0.8)'
-      ctx.beginPath(); ctx.arc(px1, py1, 3, 0, Math.PI * 2); ctx.fill()
-      ctx.beginPath(); ctx.arc(px2, py2, 3, 0, Math.PI * 2); ctx.fill()
-      ctx.fillStyle = 'rgba(255,255,255,0.8)'
+      ctx.fillStyle = isRefSelected ? 'rgba(251,191,36,0.95)' : 'rgba(52,211,153,0.85)'
+      ctx.beginPath(); ctx.arc(px1, py1, isRefSelected ? 5 : 3, 0, Math.PI * 2); ctx.fill()
+      ctx.beginPath(); ctx.arc(px2, py2, isRefSelected ? 5 : 3, 0, Math.PI * 2); ctx.fill()
+      ctx.fillStyle = isRefSelected ? '#fbbf24' : 'rgba(255,255,255,0.8)'
+      ctx.font = isRefSelected ? 'bold 12px JetBrains Mono, monospace' : '12px JetBrains Mono, monospace'
       ctx.fillText(obj.label, (px1 + px2) / 2 + 5, (py1 + py2) / 2)
     } else if (obj.type === 'parallel') {
       const ref = geoObjects.value[obj.refIdx]
-      if (!ref || (ref.type !== 'line' && ref.type !== 'segment')) continue
+      if (!ref || (ref.type !== 'line' && ref.type !== 'segment')) return
       const dx = ref.x2 - ref.x1, dy = ref.y2 - ref.y1
       const len = Math.hypot(dx, dy)
-      if (len < 1e-12) continue
+      if (len < 1e-12) return
       const ux = dx / len, uy = dy / len
       const far = Math.max(cw, ch) / scale.value * 2
       const [px1, py1] = mathToPx(obj.px - ux * far, obj.py - uy * far)
@@ -921,10 +1026,10 @@ function drawGeoObjects() {
       ctx.fillStyle = 'rgba(255,255,255,0.8)'; ctx.fillText(obj.label, lx + 5, ly)
     } else if (obj.type === 'perp') {
       const ref = geoObjects.value[obj.refIdx]
-      if (!ref || (ref.type !== 'line' && ref.type !== 'segment')) continue
+      if (!ref || (ref.type !== 'line' && ref.type !== 'segment')) return
       const dx = ref.x2 - ref.x1, dy = ref.y2 - ref.y1
       const len = Math.hypot(dx, dy)
-      if (len < 1e-12) continue
+      if (len < 1e-12) return
       // 垂直方向: rotate 90度
       const ux = -dy / len, uy = dx / len
       const far = Math.max(cw, ch) / scale.value * 2
@@ -938,19 +1043,22 @@ function drawGeoObjects() {
       ctx.fillStyle = 'rgba(255,255,255,0.8)'; ctx.fillText(obj.label, lx + 5, ly)
     } else if (obj.type === 'intersection') {
       const [px, py] = mathToPx(obj.x, obj.y)
-      ctx.fillStyle = '#f43f5e'
-      ctx.beginPath(); ctx.arc(px, py, 5, 0, Math.PI * 2); ctx.fill()
-      ctx.strokeStyle = 'rgba(255,255,255,0.6)'; ctx.lineWidth = 1.5; ctx.stroke()
+      // 如果当前还在交点工具流程中，且该交点对象绑定到已选中的函数，稍微高亮
+      const linked = (constructTool.value === 'intersection' && constructStep.value === 1) &&
+        (obj.funcA === selectedFuncIdx.value || obj.funcB === selectedFuncIdx.value)
+      ctx.fillStyle = linked ? '#fde047' : '#f43f5e'
+      ctx.beginPath(); ctx.arc(px, py, linked ? 6.5 : 5, 0, Math.PI * 2); ctx.fill()
+      ctx.strokeStyle = 'rgba(255,255,255,0.6)'; ctx.lineWidth = linked ? 2 : 1.5; ctx.stroke()
       ctx.fillStyle = 'rgba(255,255,255,0.9)'
       ctx.fillText(obj.label, px + 8, py - 8)
       ctx.fillStyle = 'rgba(255,255,255,0.5)'
       ctx.fillText(`(${obj.x.toFixed(3)}, ${obj.y.toFixed(3)})`, px + 8, py + 6)
     }
-  }
+  })
 
   // 绘制构造中的临时点
-  if (tempP1 && constructTool.value !== 'point' && constructTool.value !== 'intersection') {
-    const [px, py] = mathToPx(tempP1[0], tempP1[1])
+  if (tempP1.value && constructTool.value !== 'point' && constructTool.value !== 'intersection') {
+    const [px, py] = mathToPx(tempP1.value[0], tempP1.value[1])
     ctx.fillStyle = 'rgba(251,191,36,0.6)'
     ctx.beginPath(); ctx.arc(px, py, 4, 0, Math.PI * 2); ctx.fill()
     ctx.strokeStyle = 'rgba(255,255,255,0.3)'; ctx.lineWidth = 1; ctx.stroke()
@@ -961,9 +1069,9 @@ function redraw() {
   if (!ctx) return
   ctx.clearRect(0, 0, cw, ch)
   drawGrid()
-  for (const f of funcs) {
-    if (f.enabled) drawFunc(f)
-  }
+  funcs.forEach((f, i) => {
+    if (f.enabled) drawFunc(f, i)
+  })
   drawSketches()
   drawGeoObjects()
 }

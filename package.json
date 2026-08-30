@@ -16,19 +16,22 @@
     "electron:build:nsis": "npm run icons && npm run build && electron-builder --win nsis",
     "android:init": "npm run build && npx cap add android && npm run icons",
     "android:open": "npx cap open android",
-    "android:sync": "npm run build && npm run icons && npx cap sync android",
-    "android:copy": "npm run build && npm run icons && npx cap copy android",
-    "android:debug": "npm run android:copy && (if (Test-Path android\\gradlew.bat) { cd android ; .\\gradlew.bat assembleDebug --no-daemon } else { npx cap build android } )",
-    "android:release": "npm run android:copy && (if (Test-Path android\\gradlew.bat) { cd android ; .\\gradlew.bat assembleRelease --no-daemon } else { npx cap build android } )",
-    "android:apk": "npm run android:debug"
+    "android:sync": "npm run build && npx cap sync android",
+    "android:copy": "npm run build && npx cap copy android",
+    "android:update": "npx cap update android",
+    "android:doctor": "npx cap doctor android",
+    "android:debug": "scripts\\android-build.bat debug",
+    "android:release": "scripts\\android-build.bat release",
+    "android:apk": "scripts\\android-build.bat debug",
+    "android:envcheck": "scripts\\android-envcheck.bat"
   },
   "dependencies": {
+    "@capacitor/android": "6.2.0",
+    "@capacitor/core": "6.2.0",
     "vue": "^3.5.41"
   },
   "devDependencies": {
-    "@capacitor/android": "^5.0.0",
-    "@capacitor/cli": "^5.0.0",
-    "@capacitor/core": "^5.0.0",
+    "@capacitor/cli": "6.2.0",
     "@vitejs/plugin-vue": "^5.2.4",
     "autoprefixer": "^10.5.4",
     "concurrently": "^8.2.2",
@@ -46,7 +49,7 @@
     "copyright": "Copyright © 2026 Prism Technology Studio",
     "asar": true,
     "directories": {
-      "output": "release-final"
+      "output": "release-scp-v1.2.1b"
     },
     "files": [
       "dist/**/*",

@@ -1,7 +1,8 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="app_name">科学计算器</string>
-    <string name="title_activity_main">科学计算器</string>
+    <string name="app_name">SCP</string>
+    <string name="app_name_long">Scientific Calculator Plus</string>
+    <string name="title_activity_main">SCP</string>
     <string name="package_name">com.scientific.calculator</string>
     <string name="custom_url_scheme">com.scientific.calculator</string>
 </resources>

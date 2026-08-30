@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- SCP 应用主色：深夜蓝 + 紫色主题色 -->
+    <color name="colorPrimary">#6366f1</color>
+    <color name="colorPrimaryDark">#4338ca</color>
+    <color name="colorAccent">#a855f7</color>
+    <color name="colorSplashBackground">#0b1220</color>
+    <color name="colorAppBackground">#0b1220</color>
+    <color name="colorWindowBackground">#0b1220</color>
+</resources>

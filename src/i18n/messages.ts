@@ -87,7 +87,15 @@ export const messages = {
       noHistory: '暂无记录',
       noHistoryHint: '按 = 计算后会记录到这里',
       modes: { COMP: 'COMP', CMPLX: 'CMPLX', STAT: 'STAT', 'BASE-N': 'BASE', 'EQN': 'EQN', 'MAT': 'MAT' },
-      angles: { Deg: 'D', Rad: 'R', Grad: 'G' }
+      angles: { Deg: 'D', Rad: 'R', Grad: 'G' },
+      notation: {
+        NORMAL: 'NORM',
+        SCI: 'SCI',
+        ENG: 'ENG',
+        FRAC: 'a/b',
+        LINEAR: 'FIX'
+      },
+      notationHint: '记数模式（按 ENG / SHIFT+NORM 循环：普通 → 科学 → 工程 → 分数 → 线性）'
     },
     theme: {
       hint: '点击循环：跟随系统 / 深色 / 明亮',
@@ -112,7 +120,10 @@ export const messages = {
       hintLine1: '点击第一个点', hintLine2: '点击第二个点',
       hintParallel1: '点击已有的线/线段', hintParallel2: '点击要经过的点',
       hintIntersect1: '点击第一个函数', hintIntersect2: '点击第二个函数',
-      paramBindings: '参数绑定 (a, b, c, m, n, k, d, z)'
+      paramBindings: '参数绑定 (a, b, c, m, n, k, d, z)',
+      closePanel: '关闭控制栏',
+      selected: '已选中',
+      selectedBadge: '选中'
     },
     advanced: {
       title: '高级数学工具',
@@ -279,7 +290,15 @@ export const messages = {
       history: 'History', historyCount: 'items', clearHistory: 'Clear',
       noHistory: 'No records', noHistoryHint: 'Results will appear here after pressing =',
       modes: { COMP: 'COMP', CMPLX: 'CMPLX', STAT: 'STAT', 'BASE-N': 'BASE', 'EQN': 'EQN', 'MAT': 'MAT' },
-      angles: { Deg: 'D', Rad: 'R', Grad: 'G' }
+      angles: { Deg: 'D', Rad: 'R', Grad: 'G' },
+      notation: {
+        NORMAL: 'NORM',
+        SCI: 'SCI',
+        ENG: 'ENG',
+        FRAC: 'a/b',
+        LINEAR: 'FIX'
+      },
+      notationHint: 'Notation mode (ENG / SHIFT+NORM cycles: Normal → Sci → Eng → Fraction → Linear)'
     },
     theme: { hint: 'Click to cycle: System / Dark / Light', mode: { system: 'System', dark: 'Dark', light: 'Light' } },
     graph: {
@@ -295,7 +314,10 @@ export const messages = {
       hintLine1: 'Click first point', hintLine2: 'Click second point',
       hintParallel1: 'Click near a line/segment', hintParallel2: 'Click point to pass through',
       hintIntersect1: 'Click near first function', hintIntersect2: 'Click near second function',
-      paramBindings: 'Parameter bindings (a, b, c, m, n, k, d, z)'
+      paramBindings: 'Parameter bindings (a, b, c, m, n, k, d, z)',
+      closePanel: 'Close Panel',
+      selected: 'Selected',
+      selectedBadge: 'SEL'
     },
     advanced: {
       title: 'Advanced Math Tools', empty: 'Select a feature and click Compute', go: '▶ Compute',
@@ -405,7 +427,15 @@ export const messages = {
       history: '歷史紀錄', historyCount: '筆', clearHistory: '清空',
       noHistory: '尚無紀錄', noHistoryHint: '按 = 計算後會記錄於此',
       modes: { COMP: 'COMP', CMPLX: 'CMPLX', STAT: 'STAT', 'BASE-N': 'BASE', 'EQN': 'EQN', 'MAT': 'MAT' },
-      angles: { Deg: 'D', Rad: 'R', Grad: 'G' }
+      angles: { Deg: 'D', Rad: 'R', Grad: 'G' },
+      notation: {
+        NORMAL: 'NORM',
+        SCI: 'SCI',
+        ENG: 'ENG',
+        FRAC: 'a/b',
+        LINEAR: 'FIX'
+      },
+      notationHint: '記數模式（按 ENG / SHIFT+NORM 迴圈：普通 → 科學 → 工程 → 分數 → 線性）'
     },
     theme: {
       hint: '點擊依序切換：跟隨系統 / 深色 / 亮色',
@@ -424,7 +454,10 @@ export const messages = {
       hintLine1: '點擊第一個點', hintLine2: '點擊第二個點',
       hintParallel1: '點擊已有的線/線段', hintParallel2: '點擊要經過的點',
       hintIntersect1: '點擊第一個函數', hintIntersect2: '點擊第二個函數',
-      paramBindings: '參數繫結 (a, b, c, m, n, k, d, z)'
+      paramBindings: '參數繫結 (a, b, c, m, n, k, d, z)',
+      closePanel: '關閉控制欄',
+      selected: '已選中',
+      selectedBadge: '選中'
     },
     advanced: {
       title: '進階數學工具', empty: '請選擇功能並點擊運算按鈕', go: '▶ 運算',
@@ -543,7 +576,15 @@ export const messages = {
       history: '履歴', historyCount: '件', clearHistory: 'クリア',
       noHistory: '履歴なし', noHistoryHint: '= で計算するとここに表示されます',
       modes: { COMP: 'COMP', CMPLX: 'CMPLX', STAT: 'STAT', 'BASE-N': 'BASE', 'EQN': 'EQN', 'MAT': 'MAT' },
-      angles: { Deg: 'D', Rad: 'R', Grad: 'G' }
+      angles: { Deg: 'D', Rad: 'R', Grad: 'G' },
+      notation: {
+        NORMAL: 'NORM',
+        SCI: 'SCI',
+        ENG: 'ENG',
+        FRAC: 'a/b',
+        LINEAR: 'FIX'
+      },
+      notationHint: '表記モード (ENG / SHIFT+NORM で切替: 通常 → 科学 → 工学 → 分数 → 線形)'
     },
     theme: {
       hint: 'クリックで切替: システム / ダーク / ライト',
@@ -562,7 +603,10 @@ export const messages = {
       hintLine1: '最初の点をクリック', hintLine2: '2番目の点をクリック',
       hintParallel1: '線/線分の近くをクリック', hintParallel2: '通過点をクリック',
       hintIntersect1: '最初の関数をクリック', hintIntersect2: '2番目の関数をクリック',
-      paramBindings: 'パラメータ束縛 (a, b, c, m, n, k, d, z)'
+      paramBindings: 'パラメータ束縛 (a, b, c, m, n, k, d, z)',
+      closePanel: 'コントロールパネルを閉じる',
+      selected: '選択中',
+      selectedBadge: '選択'
     },
     advanced: {
       title: '高度な数学ツール', empty: '機能を選んで「計算」をクリック', go: '▶ 計算',
@@ -682,7 +726,15 @@ export const messages = {
       history: 'История', historyCount: 'зап.', clearHistory: 'Очистить',
       noHistory: 'Нет записей', noHistoryHint: 'Здесь появятся результаты после нажатия =',
       modes: { COMP: 'COMP', CMPLX: 'CMPLX', STAT: 'STAT', 'BASE-N': 'BASE', 'EQN': 'EQN', 'MAT': 'MAT' },
-      angles: { Deg: 'D', Rad: 'R', Grad: 'G' }
+      angles: { Deg: 'D', Rad: 'R', Grad: 'G' },
+      notation: {
+        NORMAL: 'NORM',
+        SCI: 'SCI',
+        ENG: 'ENG',
+        FRAC: 'a/b',
+        LINEAR: 'FIX'
+      },
+      notationHint: 'Режим записи (ENG / SHIFT+NORM переключает: Обычн. → Научн. → Инж. → Дробь → Линейн.)'
     },
     theme: {
       hint: 'Нажмите, чтобы переключить: Системная / Тёмная / Светлая',
@@ -701,7 +753,10 @@ export const messages = {
       hintLine1: 'Кликните первую точку', hintLine2: 'Кликните вторую точку',
       hintParallel1: 'Кликните существующую прямую/отрезок', hintParallel2: 'Кликните точку для прохода',
       hintIntersect1: 'Кликните первую функцию', hintIntersect2: 'Кликните вторую функцию',
-      paramBindings: 'Значения параметров (a, b, c, m, n, k, d, z)'
+      paramBindings: 'Значения параметров (a, b, c, m, n, k, d, z)',
+      closePanel: 'Закрыть панель',
+      selected: 'Выбрано',
+      selectedBadge: 'ВЫБР'
     },
     advanced: {
       title: 'Продвинутые математические инструменты',
@@ -822,7 +877,15 @@ export const messages = {
       history: 'Historique', historyCount: 'éléments', clearHistory: 'Effacer',
       noHistory: 'Aucun enregistrement', noHistoryHint: 'Les résultats apparaîtront ici après =',
       modes: { COMP: 'COMP', CMPLX: 'CMPLX', STAT: 'STAT', 'BASE-N': 'BASE', 'EQN': 'EQN', 'MAT': 'MAT' },
-      angles: { Deg: 'D', Rad: 'R', Grad: 'G' }
+      angles: { Deg: 'D', Rad: 'R', Grad: 'G' },
+      notation: {
+        NORMAL: 'NORM',
+        SCI: 'SCI',
+        ENG: 'ENG',
+        FRAC: 'a/b',
+        LINEAR: 'FIX'
+      },
+      notationHint: 'Mode de notation (ENG / SHIFT+NORM cycle : Normal → Sci → Eng → Fraction → Linéaire)'
     },
     theme: {
       hint: 'Cliquez pour alterner : Système / Sombre / Clair',
@@ -841,7 +904,10 @@ export const messages = {
       hintLine1: 'Cliquez le premier point', hintLine2: 'Cliquez le second point',
       hintParallel1: 'Cliquez une droite/segment existant', hintParallel2: 'Cliquez le point de passage',
       hintIntersect1: 'Cliquez la première fonction', hintIntersect2: 'Cliquez la seconde fonction',
-      paramBindings: 'Valeurs des paramètres (a, b, c, m, n, k, d, z)'
+      paramBindings: 'Valeurs des paramètres (a, b, c, m, n, k, d, z)',
+      closePanel: 'Fermer le panneau',
+      selected: 'Sélectionné',
+      selectedBadge: 'SEL'
     },
     advanced: {
       title: 'Outils mathématiques avancés',
@@ -962,7 +1028,15 @@ export const messages = {
       history: 'Verlauf', historyCount: 'Einträge', clearHistory: 'Leeren',
       noHistory: 'Keine Einträge', noHistoryHint: 'Ergebnisse erscheinen hier nach =',
       modes: { COMP: 'COMP', CMPLX: 'CMPLX', STAT: 'STAT', 'BASE-N': 'BASE', 'EQN': 'EQN', 'MAT': 'MAT' },
-      angles: { Deg: 'D', Rad: 'R', Grad: 'G' }
+      angles: { Deg: 'D', Rad: 'R', Grad: 'G' },
+      notation: {
+        NORMAL: 'NORM',
+        SCI: 'SCI',
+        ENG: 'ENG',
+        FRAC: 'a/b',
+        LINEAR: 'FIX'
+      },
+      notationHint: 'Notationsmodus (ENG / SHIFT+NORM zyklisch: Normal → Wiss. → Tech. → Bruch → Linear)'
     },
     theme: {
       hint: 'Klicken zum Wechseln: System / Dunkel / Hell',
@@ -981,7 +1055,10 @@ export const messages = {
       hintLine1: 'Ersten Punkt klicken', hintLine2: 'Zweiten Punkt klicken',
       hintParallel1: 'Nahe einer Geraden/Strecke klicken', hintParallel2: 'Durchgangspunkt klicken',
       hintIntersect1: 'Erste Funktion klicken', hintIntersect2: 'Zweite Funktion klicken',
-      paramBindings: 'Parameter-Werte (a, b, c, m, n, k, d, z)'
+      paramBindings: 'Parameter-Werte (a, b, c, m, n, k, d, z)',
+      closePanel: 'Bedienfeld schließen',
+      selected: 'Ausgewählt',
+      selectedBadge: 'AUSG'
     },
     advanced: {
       title: 'Erweiterte Mathematik-Tools',

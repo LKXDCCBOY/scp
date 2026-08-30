@@ -21,8 +21,8 @@ export interface KeyDef {
   alphaLabel?: string
   /** 按键视觉类：key-num / key-op / key-func / key-clear / key-eq / key-special */
   cls?: string
-  /** 占据列数 (1 或 2) */
-  span?: 1 | 2
+  /** 占据列数 */
+  span?: 1 | 2 | 3 | 4 | 5 | 6
   /** 是否禁用（保留占位，如积分等复杂功能） */
   disabled?: boolean
   /** 字体大小调节 -1:小 0:中 1:大 */

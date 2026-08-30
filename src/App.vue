@@ -1,34 +1,34 @@
 <template>
-  <div class="h-full w-full flex flex-col">
+  <div class="h-full w-full flex flex-col layout-root" :class="rootSizeClasses">
     <!-- 背景极光 -->
     <div class="bg-aurora"></div>
 
     <!-- 顶部状态栏 -->
-    <header class="flex-none w-full px-3 lg:px-4 py-1.5 flex items-center justify-between z-10 animate-fade-in gap-3">
-      <div class="flex items-center gap-2 min-w-0">
-        <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-gradient-to-br from-blue-500/60 to-purple-500/60 border backdrop-blur-md
+    <header class="flex-none w-full px-2 sm:px-3 lg:px-4 py-1 flex items-center justify-between z-10 animate-fade-in gap-2 header-compact" :class="headerSizeClasses">
+      <div class="flex items-center gap-1.5 sm:gap-2 min-w-0">
+        <div class="w-6 h-6 sm:w-7 sm:h-7 lg:w-8 lg:h-8 rounded-full bg-gradient-to-br from-blue-500/60 to-purple-500/60 border backdrop-blur-md
                     flex items-center justify-center shadow-glow animate-logo-pulse overflow-hidden flex-none"
              :style="{ borderColor: 'var(--chip-border)' }">
-          <img src="/logo.png" alt="Logo" width="18" height="18" class="flex-none" style="object-fit: contain; image-rendering: high-quality;"/>
+          <img src="/logo.png" alt="Logo" width="16" height="16" class="flex-none" style="object-fit: contain; image-rendering: high-quality;"/>
         </div>
-        <div class="min-w-0">
-          <h1 class="text-xs sm:text-sm font-semibold tracking-wide leading-tight truncate" :style="{ color: 'var(--text)' }">{{ t('app.title') }}</h1>
-          <p class="text-[9px] sm:text-[10px] tracking-wider leading-tight truncate" :style="{ color: 'var(--text-muted)' }">{{ t('app.subtitle') }}</p>
+        <div class="min-w-0 header-title-wrap">
+          <h1 class="text-[11px] sm:text-xs lg:text-sm font-semibold tracking-wide leading-tight truncate" :style="{ color: 'var(--text)' }">{{ t('app.title') }}</h1>
+          <p class="text-[8px] sm:text-[9px] lg:text-[10px] tracking-wider leading-tight truncate header-subtitle" :style="{ color: 'var(--text-muted)' }">{{ t('app.subtitle') }}</p>
         </div>
       </div>
       <!-- 右侧：主题切换 + 语言切换 + 标签页 -->
-      <div class="flex items-center gap-1.5 sm:gap-2 flex-none">
+      <div class="flex items-center gap-1 sm:gap-1.5 lg:gap-2 flex-none min-w-0">
         <!-- 主题切换 -->
         <button @click="cycleTheme"
                 :title="themeButtonTitle"
-                class="w-7 h-7 sm:w-8 sm:h-8 rounded-lg flex items-center justify-center border backdrop-blur-md transition hover:scale-105 active:scale-95"
+                class="w-6 h-6 sm:w-7 sm:h-7 lg:w-8 lg:h-8 rounded-lg flex items-center justify-center border backdrop-blur-md transition hover:scale-105 active:scale-95 flex-none"
                 :style="themeBtnStyle">
           <!-- 月亮（深色） -->
-          <svg v-if="themeMode === 'dark'" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <svg v-if="themeMode === 'dark'" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/>
           </svg>
           <!-- 太阳（明亮） -->
-          <svg v-else-if="themeMode === 'light'" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <svg v-else-if="themeMode === 'light'" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <circle cx="12" cy="12" r="4"/>
             <line x1="12" y1="2" x2="12" y2="5"/>
             <line x1="12" y1="19" x2="12" y2="22"/>
@@ -40,26 +40,26 @@
             <line x1="17.7" y1="6.3" x2="19.8" y2="4.2"/>
           </svg>
           <!-- 显示器（跟随系统） -->
-          <svg v-else viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <svg v-else viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <rect x="3" y="4" width="18" height="12" rx="2"/>
             <line x1="8" y1="20" x2="16" y2="20"/>
             <line x1="12" y1="16" x2="12" y2="20"/>
           </svg>
         </button>
         <!-- Language 按钮 + 下拉列表（Teleport 到 body 彻底避开 overflow / z-index 遮挡） -->
-        <div class="relative" data-lang-root>
+        <div class="relative flex-none" data-lang-root>
           <button ref="langBtnRef"
                   @click.stop="toggleLangMenu"
-                  class="h-7 sm:h-8 px-2.5 rounded-lg flex items-center gap-1.5 border backdrop-blur-md transition hover:scale-105 active:scale-95"
+                  class="h-6 sm:h-7 lg:h-8 px-1.5 sm:px-2 lg:px-2.5 rounded-lg flex items-center gap-1 border backdrop-blur-md transition hover:scale-105 active:scale-95"
                   :style="{ background: 'var(--chip-bg)', borderColor: 'var(--chip-border)', color: 'var(--text)' }">
-            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <svg viewBox="0 0 24 24" width="12" height="12" class="flex-none" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <circle cx="12" cy="12" r="10"/>
               <line x1="2" y1="12" x2="22" y2="12"/>
               <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
             </svg>
-            <span class="text-[10px] sm:text-[11px] font-medium">Language</span>
-            <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"
-                 class="transition-transform"
+            <span class="text-[9px] sm:text-[10px] lg:text-[11px] font-medium hidden xs:inline">Lang</span>
+            <svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"
+                 class="transition-transform flex-none"
                  :style="{ transform: langMenuOpen ? 'rotate(180deg)' : 'none', opacity: 0.6 }">
               <polyline points="6 9 12 15 18 9"/>
             </svg>
@@ -76,32 +76,32 @@
                    top: langMenuPos.top + 'px',
                    right: langMenuPos.right + 'px',
                    width: langMenuPos.width + 'px',
-                   minWidth: '180px',
+                   minWidth: '160px',
                    zIndex: 99999,
                    background: 'var(--panel-bg)',
                    borderColor: 'var(--chip-border)'
                  }">
               <button v-for="l in languages" :key="l.code"
                 @click="pickLang(l.code)"
-                class="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-left transition"
+                class="w-full flex items-center gap-2 px-2 py-1.5 rounded-lg text-left transition"
                 :style="lang === l.code
                   ? { background: 'var(--primary-bg)', color: 'var(--primary-text)' }
                   : { color: 'var(--text)' }"
                 :class="lang !== l.code ? 'hover:opacity-80' : ''">
-                <span class="text-base">{{ l.flag }}</span>
-                <span class="text-[12px] sm:text-[13px] font-medium flex-1">{{ l.label }}</span>
-                <svg v-if="lang === l.code" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                <span class="text-sm">{{ l.flag }}</span>
+                <span class="text-[11px] sm:text-[12px] font-medium flex-1 truncate">{{ l.label }}</span>
+                <svg v-if="lang === l.code" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
                   <polyline points="20 6 9 17 4 12"/>
                 </svg>
               </button>
             </div>
           </transition>
         </Teleport>
-        <!-- 标签页 -->
-        <div class="flex items-center gap-1">
+        <!-- 标签页（横向滚动，防止小屏溢出） -->
+        <div class="flex items-center gap-0.5 sm:gap-1 overflow-x-auto scrollbar-thin tabs-scroll max-w-[50vw] sm:max-w-none">
           <button v-for="tab in tabs" :key="tab.id"
             @click="activeTab = tab.id"
-            class="mode-chip text-[10px] sm:text-[11px] px-2 sm:px-2.5 py-1 transition-all duration-300"
+            class="mode-chip text-[9px] sm:text-[10px] lg:text-[11px] px-1.5 sm:px-2 lg:px-2.5 py-0.5 sm:py-1 transition-all duration-300 whitespace-nowrap flex-none"
             :class="{ active: activeTab === tab.id }">
             {{ t('tabs.' + tab.id) }}
           </button>
@@ -109,16 +109,18 @@
       </div>
     </header>
 
-    <!-- 横屏桌面：左键盘 + 右面板 -->
-    <main class="flex-1 flex flex-col lg:flex-row min-h-0 px-3 sm:px-4 lg:px-5 pb-3 gap-3 relative z-10">
+    <!-- 横屏桌面：左键盘 + 右面板；小屏/手机：上屏幕 下键盘 -->
+    <main class="flex-1 flex flex-col landscape-lg:flex-row min-h-0 px-1.5 sm:px-3 lg:px-5 pb-1.5 sm:pb-3 gap-1.5 sm:gap-3 relative z-10 main-compact">
 
-      <!-- ============ 左侧：键盘区 ============ -->
-      <div class="flex-none lg:w-[340px] xl:w-[380px] flex flex-col min-h-0">
+      <!-- ============ 小屏（< landscape-lg）：屏幕放上面 ============ -->
+      <!-- ============ 大屏（>= landscape-lg）：键盘放左边 ============ -->
+      <!-- ============ 左侧/上方：键盘区（大屏左，小屏下） ============ -->
+      <div class="kbd-col flex-none landscape-lg:w-[320px] xl:w-[360px] 2xl:w-[380px] flex flex-col min-h-0 order-2 landscape-lg:order-1">
         <CalcKeyboard :state="state" @press="pressKeyOrRoute" class="flex-1 min-h-0" />
       </div>
 
-      <!-- ============ 右侧：屏幕/绘图/Python ============ -->
-      <div class="flex-1 flex flex-col min-h-0 min-w-0">
+      <!-- ============ 右侧/上方：屏幕/绘图/Python（大屏右，小屏上） ============ -->
+      <div class="flex-1 flex flex-col min-h-0 min-w-0 order-1 landscape-lg:order-2 screen-col">
         <transition name="fade" mode="out-in">
           <CalcScreen
             v-if="activeTab === 'calc'"
@@ -176,29 +178,29 @@
     <!-- 右下角：关于按钮 -->
     <button @click="openAbout"
             title="关于 Prism Technology Studio"
-            class="fixed bottom-3 right-3 z-50 w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center border backdrop-blur-md transition hover:scale-110 active:scale-95"
+            class="fixed bottom-2 right-2 sm:bottom-3 sm:right-3 z-50 w-6 h-6 sm:w-7 sm:h-7 lg:w-8 lg:h-8 rounded-full flex items-center justify-center border backdrop-blur-md transition hover:scale-110 active:scale-95 about-btn"
             :style="{ background: 'var(--chip-bg)', borderColor: 'var(--chip-border)', color: 'var(--text-dim)' }">
-      <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <circle cx="12" cy="12" r="10"/>
         <line x1="12" y1="16" x2="12" y2="12"/>
         <line x1="12" y1="8" x2="12.01" y2="8"/>
       </svg>
     </button>
 
-    <!-- 左下角：悬浮按键说明 -->
+    <!-- 左下角：悬浮按键说明（小屏只在 hover 时显示，且更小） -->
     <transition name="slide-up">
-      <div v-if="hintVisible"
-           class="fixed bottom-2 left-2 z-50 max-w-[320px] sm:max-w-[380px] glass-panel px-2.5 py-1.5 flex items-start gap-2"
+      <div v-if="hintVisible && hoveredKeyId"
+           class="fixed bottom-2 left-2 z-50 max-w-[260px] sm:max-w-[320px] lg:max-w-[380px] glass-panel px-2 py-1 flex items-start gap-1.5 hint-panel"
            :class="{ 'hint-empty': !hoveredKeyId }">
-        <span class="text-[9px] sm:text-[10px] text-white/40 flex-none mt-0.5 whitespace-nowrap">{{ t('hint.title') }}</span>
-        <span class="text-[11px] sm:text-xs text-white/75 leading-snug flex-1">{{ hintText }}</span>
+        <span class="text-[8px] sm:text-[9px] lg:text-[10px] flex-none mt-0.5 whitespace-nowrap" style="color: var(--text-muted);">{{ t('hint.title') }}</span>
+        <span class="text-[10px] sm:text-[11px] lg:text-xs leading-snug flex-1 hint-text">{{ hintText }}</span>
       </div>
     </transition>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, computed, onMounted, onUnmounted, watch } from 'vue'
+import { ref, reactive, computed, onMounted, onUnmounted, watch, nextTick } from 'vue'
 import CalcScreen from '@/components/CalcScreen.vue'
 import CalcKeyboard from '@/components/CalcKeyboard.vue'
 import GraphPanel from '@/components/GraphPanel.vue'
@@ -352,6 +354,27 @@ try {
   if (saved && languages.some(l => l.code === saved)) setLang(saved)
 } catch { /* ignore */ }
 
+// ============ 视口尺寸级别（保证小屏显示逻辑）============
+const viewport = reactive({ w: window.innerWidth, h: window.innerHeight })
+const rootSizeClasses = computed(() => {
+  const classes = []
+  if (viewport.h < 560) classes.push('compact-header', 'vh-ultra')
+  else if (viewport.h < 680) classes.push('compact-header', 'vh-compact')
+  if (viewport.w < 420) classes.push('vw-ultra')
+  else if (viewport.w < 640) classes.push('vw-compact')
+  return classes.join(' ')
+})
+const headerSizeClasses = computed(() => {
+  if (viewport.w < 420 || viewport.h < 560) return 'hide-title'
+  if (viewport.w < 520 || viewport.h < 640) return 'hide-subtitle'
+  return ''
+})
+function applyViewport() {
+  viewport.w = window.innerWidth
+  viewport.h = window.innerHeight
+  if (langMenuOpen.value) nextTick(updateLangMenuPos)
+}
+
 function onClickOutsideLangMenu(e: MouseEvent) {
   if (!langMenuOpen.value) return
   const t = e.target as HTMLElement
@@ -367,12 +390,15 @@ function onLangMenuReposition() {
 onMounted(() => {
   window.addEventListener('keydown', onKey)
   document.addEventListener('mousedown', onClickOutsideLangMenu)
+  window.addEventListener('resize', applyViewport)
   window.addEventListener('resize', onLangMenuReposition)
   window.addEventListener('scroll', onLangMenuReposition, true)
+  applyViewport()
 })
 onUnmounted(() => {
   window.removeEventListener('keydown', onKey)
   document.removeEventListener('mousedown', onClickOutsideLangMenu)
+  window.removeEventListener('resize', applyViewport)
   window.removeEventListener('resize', onLangMenuReposition)
   window.removeEventListener('scroll', onLangMenuReposition, true)
 })
@@ -388,4 +414,24 @@ onUnmounted(() => {
 .slide-up-leave-to { opacity: 0; transform: translateY(8px); }
 
 .hint-empty { opacity: 0.55; }
+
+/* JS 驱动的小屏紧凑模式 */
+:deep(.hide-subtitle .header-subtitle) { display: none; }
+:deep(.hide-title .header-title-wrap) { display: none; }
+
+/* 视口高度紧凑：压缩键盘/屏幕面板的内边距 */
+:deep(.vh-compact .screen-glass) { padding: 0.6rem 0.8rem !important; }
+:deep(.vh-compact .calc-kb-root) { padding: 0.3rem !important; }
+:deep(.vh-compact .calc-kb-grid) { gap: 0.2rem !important; }
+:deep(.vh-compact .screen-glass > div:first-child) { margin-bottom: 0.4rem !important; }
+
+:deep(.vh-ultra .screen-glass) { padding: 0.45rem 0.65rem !important; }
+:deep(.vh-ultra .calc-kb-root) { padding: 0.25rem !important; }
+:deep(.vh-ultra .calc-kb-grid) { gap: 0.12rem !important; }
+:deep(.vh-ultra .screen-glass > div:first-child) { margin-bottom: 0.25rem !important; }
+:deep(.vh-ultra .glass-key) { font-size: 11px !important; }
+
+:deep(.vw-ultra .mode-chip) { padding: 0.2rem 0.32rem !important; font-size: 0.62rem !important; }
+:deep(.vw-ultra .glass-key) { font-size: 11px !important; }
+:deep(.vw-compact .mode-chip) { padding: 0.24rem 0.4rem !important; font-size: 0.68rem !important; }
 </style>

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Launch / splash screen background used by both CapacitorSplashScreen plugin
+  and Android 12+ SplashScreen API.
+
+  - Bottom layer: solid background color (@color/colorSplashBackground)
+  - Top layer:    centered app icon via adaptive icon foreground + background
+                  (reused from @mipmap/ic_launcher to avoid duplicate resources)
+-->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:drawable="@color/colorSplashBackground" />
+    <item
+        android:drawable="@mipmap/ic_launcher"
+        android:gravity="center"
+        android:width="144dp"
+        android:height="144dp" />
+</layer-list>

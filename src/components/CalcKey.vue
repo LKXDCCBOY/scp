@@ -11,13 +11,13 @@
   >
     <!-- 左上：SHIFT 第二功能 -->
     <span v-if="shiftLabel"
-          class="absolute left-1.5 top-1 text-[9px] sm:text-[10px] font-medium
+          class="absolute left-0.5 xs:left-1 sm:left-1.5 top-0.5 sm:top-1 text-[7px] xs:text-[8px] sm:text-[9px] font-medium
                  text-amber-300/80 tracking-tight pointer-events-none leading-none">
       {{ shiftLabel }}
     </span>
     <!-- 右上：ALPHA 变量 -->
     <span v-if="item.alphaLabel"
-          class="absolute right-1.5 top-1 text-[9px] sm:text-[10px] font-medium
+          class="absolute right-0.5 xs:right-1 sm:right-1.5 top-0.5 sm:top-1 text-[7px] xs:text-[8px] sm:text-[9px] sm:text-[10px] font-medium
                  text-rose-300/80 tracking-tight pointer-events-none leading-none">
       {{ item.alphaLabel }}
     </span>
@@ -28,8 +28,9 @@
 
     <!-- 右下：下标/补充说明（优先显示按键自带 subLabel；SHIFT 激活时回退显示原 label） -->
     <span v-if="displayHint"
-          class="absolute right-1.5 bottom-1 text-[8px] sm:text-[9px] text-white/35
-                 pointer-events-none leading-none">
+          class="absolute right-0.5 xs:right-1 sm:right-1.5 bottom-0.5 sm:bottom-1 text-[7px] xs:text-[8px] sm:text-[9px] opacity-40
+                 pointer-events-none leading-none"
+          style="color: var(--text-dim);">
       {{ displayHint }}
     </span>
 
@@ -58,7 +59,8 @@ const ripples = reactive<Ripple[]>([])
 let _rid = 0
 
 const spanStyle = computed(() => {
-  if (props.item.span === 2) return { gridColumn: 'span 2 / span 2' }
+  const s = props.item.span
+  if (s && s > 1) return { gridColumn: `span ${s} / span ${s}` }
   return {}
 })
 
@@ -80,10 +82,10 @@ const keyClasses = computed(() => {
 
 const sizeClass = computed(() => {
   const s = props.item.size ?? 0
-  if (s <= -1) return 'text-[12px] sm:text-xs'
-  if (s === 0)  return 'text-sm sm:text-base'
-  if (s === 1)  return 'text-base sm:text-lg'
-  return 'text-lg sm:text-xl font-bold'
+  if (s <= -1) return 'text-[10px] xs:text-[11px] sm:text-xs'
+  if (s === 0)  return 'text-[11px] xs:text-xs sm:text-sm sm:text-base'
+  if (s === 1)  return 'text-xs sm:text-base sm:text-lg'
+  return 'text-base sm:text-lg sm:text-xl font-bold'
 })
 
 const shiftLabel = computed(() => {

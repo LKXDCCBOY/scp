@@ -649,8 +649,11 @@ export function evaluate(expr: string, ctx: CalcContext): number {
 }
 
 // ==================== 输出格式化 ====================
+/** 输出记数模式类型（可扩展） */
+export type NotationMode = 'NORMAL' | 'SCI' | 'ENG' | 'FRAC' | 'LINEAR'
+
 export function formatNumber(val: number, options: {
-  notation?: 'NORMAL' | 'SCI' | 'ENG'
+  notation?: NotationMode
   precision?: number
   baseN?: BaseN
   fraction?: boolean
@@ -659,17 +662,16 @@ export function formatNumber(val: number, options: {
   if (options.baseN && options.baseN !== 'DEC') {
     return formatBaseN(val, options.baseN)
   }
-  if (fraction) {
-    const [num, den] = toFraction(val)
-    if (den === 1) return String(num)
-    return `${num}÷${den}`
+  // FRAC 模式或 fraction 选项：连分数逼近
+  if (notation === 'FRAC' || fraction) {
+    return formatFraction(val)
   }
-  let abs = Math.abs(val)
-  let sign = val < 0 ? '-' : ''
-  // NORMAL: 自动在普通/科学之间切换
-  let mantissa = abs
-  let exp = 0
+  if (notation === 'LINEAR') {
+    return formatLinear(val, precision)
+  }
   if (notation === 'NORMAL') {
+    if (!isFinite(val)) return String(val)
+    const abs = Math.abs(val)
     if (abs !== 0 && (abs >= 1e10 || abs < 1e-9)) {
       return formatSci(val, precision)
     }
@@ -680,25 +682,98 @@ export function formatNumber(val: number, options: {
   return truncateToPrecision(val, precision)
 }
 
+/** 整数 → 上标数字 Unicode */
+const SUP_DIGITS: Record<string, string> = {
+  '0': '⁰', '1': '¹', '2': '²', '3': '³', '4': '⁴',
+  '5': '⁵', '6': '⁶', '7': '⁷', '8': '⁸', '9': '⁹', '-': '⁻'
+}
+function toSup(n: number): string {
+  return String(n).split('').map(ch => SUP_DIGITS[ch] ?? ch).join('')
+}
+
 function formatSci(val: number, prec: number): string {
-  if (val === 0) return '0×10⁰'
+  if (!isFinite(val)) return String(val)
+  if (val === 0) return `0×10${toSup(0)}`
   const sign = val < 0 ? '-' : ''
   const abs = Math.abs(val)
   const exp = Math.floor(Math.log10(abs))
   const mant = abs / Math.pow(10, exp)
   const mantStr = truncateToPrecision(mant, prec)
-  return `${sign}${mantStr}×10^${exp}`
+  return `${sign}${mantStr}×10${toSup(exp)}`
 }
 
 function formatEng(val: number, prec: number): string {
-  if (val === 0) return '0×10⁰'
+  if (!isFinite(val)) return String(val)
+  if (val === 0) return `0×10${toSup(0)}`
   const sign = val < 0 ? '-' : ''
   const abs = Math.abs(val)
   let exp = Math.floor(Math.log10(abs))
   exp = exp - mod(exp, 3)
   const mant = abs / Math.pow(10, exp)
   const mantStr = truncateToPrecision(mant, prec)
-  return `${sign}${mantStr}×10^${exp}`
+  return `${sign}${mantStr}×10${toSup(exp)}`
+}
+
+/** LINEAR 模式：严格线性小数，不自动切换科学计数法；千分位 + 完整精度展示；极端范围降级为普通线性串 */
+function formatLinear(val: number, prec: number): string {
+  if (!isFinite(val)) return String(val)
+  if (val === 0) return '0'
+  const sign = val < 0 ? '-' : ''
+  const abs = Math.abs(val)
+  // 四舍五入到 prec 位有效数字（通过 toPrecision）
+  let str = abs.toPrecision(prec)
+  // 如果 toPrecision 返回 e 记法，把它展开成十进制
+  if (str.includes('e')) {
+    const [mant, expStr] = str.split('e')
+    let exp = parseInt(expStr, 10)
+    // 分离 mant 的整数/小数
+    let m = mant.replace('.', '')
+    const dotInMant = mant.includes('.') ? mant.length - 1 - mant.indexOf('.') : 0
+    const totalDecimals = dotInMant - exp
+    if (totalDecimals <= 0) {
+      // 全部整数部分：补 0 到末尾
+      str = m + '0'.repeat(-totalDecimals)
+    } else {
+      // 需要小数点
+      const intPartLen = m.length - totalDecimals
+      if (intPartLen > 0) {
+        str = m.slice(0, intPartLen) + '.' + m.slice(intPartLen)
+      } else {
+        str = '0.' + '0'.repeat(-intPartLen) + m
+      }
+    }
+  }
+  // 去掉末尾 0
+  if (str.includes('.')) {
+    str = str.replace(/0+$/, '').replace(/\.$/, '')
+  }
+  // 限制极端长度：如果最终线性串 > 40 位，退回普通小数格式
+  if (str.replace(/[.,]/g, '').length > 40) {
+    str = truncateToPrecision(abs, prec)
+  }
+  // 加千分位（整数部分）
+  const dot = str.indexOf('.')
+  if (dot >= 0) {
+    str = str.slice(0, dot).replace(/\B(?=(\d{3})+(?!\d))/g, ',') + str.slice(dot)
+  } else {
+    str = str.replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+  }
+  return sign + str
+}
+
+function formatFraction(val: number): string {
+  if (!isFinite(val)) return String(val)
+  const [num, den] = toFraction(val)
+  if (den === 1) return String(num)
+  // 带分数形式：|num| ≥ den 时展示为 a b/c
+  const sign = num < 0 ? '−' : ''
+  const absNum = Math.abs(num)
+  if (absNum >= den) {
+    const whole = Math.floor(absNum / den)
+    const rem = absNum % den
+    return rem === 0 ? `${sign}${whole}` : `${sign}${whole} ${rem}⁄${den}`
+  }
+  return `${sign}${absNum}⁄${den}`
 }
 
 function truncateToPrecision(val: number, prec: number): string {
@@ -723,33 +798,53 @@ function truncateToPrecision(val: number, prec: number): string {
   return str
 }
 
-function toFraction(x: number, maxDen: number = 10000): [number, number] {
+function toFraction(x: number, maxDen: number = 1000000): [number, number] {
   if (!isFinite(x)) return [Math.round(x), 1]
   const sign = x < 0 ? -1 : 1
   x = Math.abs(x)
-  let num = Math.floor(x)
-  let frac = x - num
-  if (frac < 1e-9) return [sign * num, 1]
-  // 连分数
-  let h0 = 0, h1 = 1, k0 = 1, k1 = 0
-  let a = Math.floor(1 / frac)
-  let remain = 1 / frac - a
-  while (true) {
-    const h = a * h1 + h0
-    const k = a * k1 + k0
-    if (k > maxDen) break
-    h0 = h1; h1 = h
-    k0 = k1; k1 = k
-    if (remain < 1e-10) break
-    a = Math.floor(1 / remain)
-    remain = 1 / remain - a
+  const whole = Math.floor(x)
+  let r = x - whole
+  if (r < 1e-12) return [sign * whole, 1]
+  // 标准连分数递推：
+  //   h_{-2}=0, h_{-1}=1 ; k_{-2}=1, k_{-1}=0
+  //   h_n = a_n * h_{n-1} + h_{n-2}
+  //   k_n = a_n * k_{n-1} + k_{n-2}
+  // a0 = floor(r) — 对小数部分恒为 0，先显式推进一次再进入循环，避免索引错位
+  let a = Math.floor(r)
+  let h2 = 0, h1 = 1, h = a * h1 + h2
+  let k2 = 1, k1 = 0, k = a * k1 + k2
+  r = r - a
+  let bestN = h, bestD = k
+  let bestErr = Math.abs((x - whole) - h / k)
+  for (let i = 0; i < 80; i++) {
+    if (r < 1e-14) break
+    const inv = 1 / r
+    a = Math.floor(inv)
+    const hNext = a * h + h1
+    const kNext = a * k + k1
+    if (kNext > maxDen) {
+      // 溢出前用 a' 做最后一步收敛（在分母约束下取最接近的近似）
+      const aP = Math.floor((maxDen - k1) / k)
+      if (aP >= 1) {
+        const hP = aP * h + h1
+        const kP = aP * k + k1
+        const eP = Math.abs((x - whole) - hP / kP)
+        if (eP < bestErr) { bestErr = eP; bestN = hP; bestD = kP }
+      }
+      break
+    }
+    h2 = h1; h1 = h; h = hNext
+    k2 = k1; k1 = k; k = kNext
+    const e = Math.abs((x - whole) - h / k)
+    if (e < bestErr) { bestErr = e; bestN = h; bestD = k }
+    if (e < 1e-14) break
+    r = inv - a
   }
-  let whole = sign * (num * k1 + h1)
-  let den = k1
-  // 约分
-  const g = gcd(Math.abs(whole), den)
-  if (g > 1) { whole /= g; den /= g }
-  return [whole, den]
+  const num = sign * (whole * bestD + bestN)
+  const den = bestD
+  const g = gcd(Math.abs(num), den)
+  if (g > 1) return [num / g, den / g]
+  return [num, den]
 }
 
 // ==================== 引擎导出 ====================
@@ -768,7 +863,7 @@ export interface EngineState {
   angleMode: AngleMode
   mode: CalcMode
   baseN: BaseN
-  notation: 'NORMAL' | 'SCI' | 'ENG'
+  notation: NotationMode
   variables: Record<string, number>
   memory: number // M 独立存储器
   history: HistoryItem[]

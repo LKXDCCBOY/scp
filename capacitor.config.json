@@ -1,14 +1,60 @@
 {
   "appId": "com.scientific.calculator",
-  "appName": "科学计算器",
+  "appName": "SCP",
+  "shortName": "SCP",
   "webDir": "dist",
+  "bundledWebRuntime": false,
+  "hideLogs": false,
   "server": {
-    "androidScheme": "https"
+    "androidScheme": "https",
+    "hostname": "localhost",
+    "allowNavigation": [
+      "cdn.jsdelivr.net",
+      "*.jsdelivr.net"
+    ],
+    "errorPath": null
   },
   "android": {
     "buildOptions": {
       "keystorePath": "",
-      "keystoreAlias": ""
+      "keystoreAlias": "",
+      "keystoreAliasPassword": "",
+      "keystorePassword": "",
+      "releaseType": "APK"
+    },
+    "allowMixedContent": true,
+    "captureInput": true,
+    "webContentsDebuggingEnabled": true,
+    "backgroundColor": "#0b1220",
+    "handleLinks": false,
+    "overlay": true,
+    "resourcePrefix": "scp_",
+    "androidXEnabled": true,
+    "includePlugins": [],
+    "excludedPlugins": [],
+    "initialFocus": true,
+    "path": "android",
+    "enableSplashScreen": true,
+    "splashImmersive": true,
+    "splashStyle": "SplashScreen",
+    "splashShowSpinner": false,
+    "splashImmersiveMode": true,
+    "splashFullScreen": true,
+    "splashAutoHide": true,
+    "splashShowDuration": 800,
+    "splashFadeInDuration": 150,
+    "splashFadeOutDuration": 200
+  },
+  "plugins": {
+    "SplashScreen": {
+      "launchShowDuration": 800,
+      "launchAutoHide": true,
+      "backgroundColor": "#0b1220",
+      "androidSplashResourceName": "splash",
+      "androidScaleType": "CENTER_CROP",
+      "showSpinner": false,
+      "splashFullScreen": true,
+      "splashImmersive": true
     }
   }
 }

@@ -1,16 +1,26 @@
 ext {
+    // Android SDK 版本（Capacitor 6 要求 minSdk 22 / compileSdk & targetSdk >= 34）
+    // 使用稳定 API 34：Android Studio 首次打开会提示并自动安装 platforms;android-34 与 build-tools;34.0.0
     minSdkVersion = 22
-    compileSdkVersion = 33
-    targetSdkVersion = 33
-    androidxActivityVersion = '1.7.0'
+    compileSdkVersion = 34
+    targetSdkVersion = 34
+
+    // AndroidX 版本（兼容 compileSdk 34）
+    androidxActivityVersion = '1.8.2'
     androidxAppCompatVersion = '1.6.1'
     androidxCoordinatorLayoutVersion = '1.2.0'
-    androidxCoreVersion = '1.10.0'
-    androidxFragmentVersion = '1.5.6'
-    coreSplashScreenVersion = '1.0.0'
-    androidxWebkitVersion = '1.6.1'
+    androidxCoreVersion = '1.13.1'
+    androidxCoreKtxVersion = '1.13.1'
+    androidxFragmentVersion = '1.7.0'
+    androidxWebkitVersion = '1.11.0'
+    coreSplashScreenVersion = '1.0.1'
+    androidxBrowserVersion = '1.8.0'
+
+    // 单元测试
     junitVersion = '4.13.2'
-    androidxJunitVersion = '1.1.5'
-    androidxEspressoCoreVersion = '3.5.1'
+    androidxJunitVersion = '1.2.1'
+    androidxEspressoCoreVersion = '3.6.1'
+
+    // Cordova 兼容层（Capacitor 内部使用）
     cordovaAndroidVersion = '10.1.1'
 }

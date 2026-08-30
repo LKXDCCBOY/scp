@@ -1,7 +1,7 @@
 <template>
-  <div class="glass-panel p-2 sm:p-2.5 w-full h-full flex flex-col relative"
+  <div class="glass-panel p-1.5 sm:p-2.5 w-full h-full flex flex-col relative calc-kb-root"
        data-kb-root>
-    <div class="grid gap-1 sm:gap-1.5 grid-cols-6 flex-1"
+    <div class="grid gap-1 sm:gap-1.5 grid-cols-6 flex-1 calc-kb-grid"
          style="grid-template-rows: repeat(10, minmax(0, 1fr));">
       <CalcKey
         v-for="(k, idx) in layout" :key="k.id + idx"
@@ -209,10 +209,9 @@ const layout = computed<KeyDef[]>(() => [
   NUM('1', { size: 1 }),
   NUM('2', { size: 1 }),
   NUM('3', { size: 1 }),
-  // row 7
-  SPECIAL('tanh', { label: 'tanh', shift: 'atanh', subLabel: 'atanh' }),
+  // row 7 — VAR 按钮 + 数字 + 运算符（正好 6 列）
+  SPECIAL('tanh', { label: 'tanh', shift: 'atanh', subLabel: 'atanh', size: 0 }),
   SPECIAL('VAR:TOGGLE', { label: 'VAR', subLabel: '未知数', cls: 'key-special', size: 0 }),
-  FUNC('x,y', { label: 'x,y', cls: 'key-func', size: 0 }),
   NUM('0', { size: 1, span: 2 }),
   OP('×', { size: 1, label: '×' }),
   OP('÷', { size: 1, label: '÷' }),
@@ -230,9 +229,9 @@ const layout = computed<KeyDef[]>(() => [
   FUNC('SPC', { label: 'SPC', cls: 'key-func', size: 1 }),
   FUNC(';', { label: ';', size: 0 }),
   FUNC(':', { label: ':', size: 0 }),
-  // row 10 — 主 = 按钮（跨 5 列宽） + 回车
-  FUNC('=', { cls: 'key-eq', size: 4, label: '=' }),
-  FUNC('↵', { label: '↵', cls: 'key-special', size: 1 })
+  // row 10 — 主 = 按钮（跨 4 列） + 回车（跨 2 列）= 6 列
+  FUNC('=', { cls: 'key-eq', size: 2, span: 4, label: '=' }),
+  FUNC('↵', { label: '↵', cls: 'key-special', size: 1, span: 2 })
 ])
 </script>
 

@@ -188,9 +188,19 @@ export function useCalculator() {
     if (state.mode === 'BASE-N') state.baseN = 'DEC'
   }
   function cycleNotation() {
-    const opts: EngineState['notation'][] = ['NORMAL', 'SCI', 'ENG']
+    const opts: EngineState['notation'][] = ['NORMAL', 'SCI', 'ENG', 'FRAC', 'LINEAR']
     const i = opts.indexOf(state.notation)
     state.notation = opts[(i + 1) % opts.length]
+    // 切换记数模式后，立即把最后一次结果用新模式重新显示
+    const last = state.history[state.history.length - 1]
+    if (last && typeof last.result === 'number' && isFinite(last.result)) {
+      resultState.value = last.result
+      resultState.display = formatNumber(last.result, {
+        notation: state.notation,
+        precision: state.precision,
+        baseN: state.mode === 'BASE-N' ? state.baseN : undefined
+      })
+    }
   }
   function cycleBaseN() {
     const i = BASE_N.indexOf(state.baseN)

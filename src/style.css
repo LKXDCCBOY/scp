@@ -486,3 +486,87 @@
 .fade-leave-to {
   opacity: 0;
 }
+
+/* ======================================================================
+   RESPONSIVE / SMALL-SCREEN ADAPTATION
+   - 桌面横屏 (>=1024px landscape): 左键盘 340~380 + 右屏幕
+   - 小屏手机 (竖屏或 <1024): 上屏幕 下键盘，比例按高度动态分配
+   - 超矮屏 (height < 560): 极致紧凑，去掉部分副标签
+   ====================================================================== */
+
+/* === 全局：小屏玻璃 panel 圆角缩小（圆角太大会吃掉可视面积） === */
+@media (max-width: 639px) {
+  .glass-panel { border-radius: 18px; backdrop-filter: blur(16px) saturate(140%); -webkit-backdrop-filter: blur(16px) saturate(140%); }
+  .screen-glass { border-radius: 18px; backdrop-filter: blur(20px) saturate(150%); -webkit-backdrop-filter: blur(20px) saturate(150%); }
+  .glass-key   { border-radius: 14px; backdrop-filter: blur(8px)  saturate(130%); -webkit-backdrop-filter: blur(8px)  saturate(130%); }
+  .tabs-scroll { scrollbar-width: none; }
+  .tabs-scroll::-webkit-scrollbar { display: none; }
+  /* 手机竖屏：屏幕高度不超过 42%，键盘占据剩余 58% 保证按键全显示 */
+  .layout-root .screen-col { max-height: 42%; }
+  .layout-root .kbd-col    { flex: 1 1 58%; }
+  .hint-panel { max-width: 70vw !important; }
+  /* 极小屏下隐藏 header subtitle（小字），让 tab 更宽 */
+  .layout-root.compact-header .header-subtitle { display: none; }
+  /* about 按钮小屏下进一步缩小，避免遮挡 */
+  .about-btn { opacity: 0.75; }
+  /* 极光效果缩小，避免干扰 */
+  .bg-aurora::before, .bg-aurora::after {
+    filter: blur(90px);
+    max-width: 420px;
+  }
+}
+
+/* 手机横屏 (宽屏但高度很小)：屏幕 38% 键盘 62%，按键更矮 */
+@media (orientation: landscape) and (max-width: 1023px) {
+  .layout-root .main-compact { flex-direction: row !important; }
+  .layout-root .kbd-col { order: 1 !important; flex: 0 0 44%; max-width: 46%; }
+  .layout-root .screen-col { order: 2 !important; flex: 1 1 auto; max-height: none; }
+  .header-subtitle { display: none; }
+  .hint-panel { display: none; }
+}
+
+/* 高度小于 640（竖屏手机常见）：缩小屏幕区、键盘更紧凑 */
+@media (max-height: 640px) {
+  .layout-root header { padding-top: 0.25rem; padding-bottom: 0.25rem; }
+  .layout-root .main-compact { padding-bottom: 0.35rem; gap: 0.35rem; }
+  .layout-root .screen-col { max-height: 38%; }
+}
+
+/* 高度小于 520（极端小屏）：进一步收缩，隐藏非必要元素 */
+@media (max-height: 520px) {
+  .header-subtitle { display: none; }
+  .about-btn { display: none; }
+  .hint-panel { display: none; }
+  .layout-root .screen-col { max-height: 34%; }
+  .glass-panel { border-radius: 14px; }
+  .screen-glass { border-radius: 14px; }
+  .glass-key { border-radius: 10px; }
+}
+
+/* 超窄屏（<380px，低端机）：进一步缩小字号和按键边距 */
+@media (max-width: 380px) {
+  .header-title-wrap { display: none; }
+  .mode-chip { font-size: 0.65rem; padding: 0.22rem 0.4rem; }
+}
+
+/* 4K / 大屏下让键盘不再过宽，保持最佳手感 */
+@media (min-width: 1600px) and (orientation: landscape) {
+  .layout-root .kbd-col { flex: 0 0 400px; }
+}
+
+/* 保证 CalcKeyboard 在小屏下按键能完整显示（10 行按键） */
+@media (max-width: 639px) and (orientation: portrait) {
+  .calc-kb-grid {
+    grid-template-rows: repeat(10, minmax(0, 1fr)) !important;
+    gap: 0.2rem !important;
+  }
+  .calc-kb-root { padding: 0.35rem !important; }
+}
+
+/* ==== 防止 Android WebView / Chrome 下双指缩放破坏布局 ==== */
+html, body {
+  touch-action: manipulation;
+  -webkit-text-size-adjust: 100%;
+  -moz-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
